@@ -1,0 +1,2810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>OSSIAN PRO &amp; TOK Buy — Unified Admin Panel</title>
+  <link id="adminFavicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23fde047'/%3E%3Cstop offset='55%25' stop-color='%23f59e0b'/%3E%3Cstop offset='100%25' stop-color='%23b45309'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='18' fill='%230f172a'/%3E%3Ccircle cx='32' cy='32' r='17' fill='none' stroke='url(%23g)' stroke-width='6'/%3E%3Cpath d='M32 10 L36 22 L32 19 L28 22 Z' fill='url(%23g)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='url(%23g)'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --surface: #ffffff;
+      --surface-2: #f8fafc;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --primary: #d97706;
+      --gold-grad: linear-gradient(135deg, #fde047 0%, #f59e0b 50%, #b45309 100%);
+      --gold-bg: rgba(245, 158, 11, 0.12);
+      --gold-border: rgba(245, 158, 11, 0.32);
+      --shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+      --nav-bg: rgba(255, 255, 255, 0.94);
+    }
+    body.dark {
+      --bg: #0b1120;
+      --surface: #111827;
+      --surface-2: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #1f2937;
+      --primary: #f59e0b;
+      --gold-bg: rgba(245, 158, 11, 0.14);
+      --gold-border: rgba(245, 158, 11, 0.34);
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.38);
+      --nav-bg: rgba(17, 24, 39, 0.94);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg); color: var(--text); min-height: 100vh; transition: background-color 0.25s, color 0.25s;
+    }
+    .gold-icon {
+      color: #f59e0b; background: var(--gold-grad);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; display: inline-block;
+    }
+
+    /* Admin Passcode Overlay */
+    .admin-lock-overlay {
+      position: fixed; inset: 0; background: #020617; z-index: 99000;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .admin-lock-overlay.hidden { display: none; }
+    .admin-lock-card {
+      width: 100%; max-width: 390px; background: #0f172a; color: #f8fafc;
+      border: 1.5px solid rgba(245, 158, 11, 0.5); border-radius: 24px;
+      padding: 24px 20px; text-align: center; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+    }
+
+    /* Shell */
+    .admin-layout { max-width: 1280px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
+    .top-header {
+      position: sticky; top: 0; z-index: 40;
+      background: var(--nav-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border); padding: 12px 16px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-logo {
+      width: 40px; height: 40px; border-radius: 12px;
+      background: linear-gradient(145deg, #0f172a, #1e293b);
+      border: 1.5px solid rgba(245, 158, 11, 0.55);
+      display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;
+    }
+    .brand-logo img { width: 100%; height: 100%; object-fit: cover; }
+    .brand-logo svg { width: 24px; height: 24px; }
+    .brand-title { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; }
+    .brand-sub { font-size: 11px; color: var(--text-muted); display: block; }
+    .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .icon-btn {
+      background: var(--surface-2); border: 1px solid var(--border); width: 38px; height: 38px;
+      border-radius: 11px; display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 15px; color: var(--text);
+    }
+    .sync-pill {
+      font-size: 11.5px; font-weight: 700; padding: 6px 12px; border-radius: 99px;
+      background: var(--surface-2); border: 1px solid var(--border);
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+
+    /* Diagnostic Warning Banner */
+    .sync-banner {
+      margin: 12px 16px 0; padding: 12px 14px; border-radius: 14px;
+      background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #ef4444; font-size: 12.5px; font-weight: 600;
+      display: none; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+    }
+    .sync-banner.show { display: flex; }
+
+    /* Navigation Tabs */
+    .nav-strip { display: flex; gap: 8px; overflow-x: auto; padding: 12px 16px 4px; scrollbar-width: none; }
+    .nav-strip::-webkit-scrollbar { display: none; }
+    .nav-tab {
+      padding: 9px 14px; border-radius: 13px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--text-muted); font-size: 12.5px; font-weight: 700;
+      cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 7px; transition: all 0.18s;
+    }
+    .nav-tab.active { background: var(--gold-grad); color: #0f172a; border-color: transparent; }
+    .badge-count {
+      background: rgba(15, 23, 42, 0.15); padding: 2px 7px; border-radius: 99px;
+      font-size: 10.5px; font-weight: 800;
+    }
+    .nav-tab.active .badge-count { background: rgba(15, 23, 42, 0.2); color: #0f172a; }
+    .badge-alert { background: #ef4444; color: #ffffff !important; }
+
+    .main-content { padding: 16px; flex: 1; }
+    .tab-pane { display: none; animation: fadeIn 0.2s ease; }
+    .tab-pane.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Stats */
+    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
+    @media (min-width: 720px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 18px;
+      padding: 15px; box-shadow: var(--shadow); cursor: pointer; transition: border-color 0.2s;
+    }
+    .stat-card:hover { border-color: #f59e0b; }
+    .stat-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .stat-icon {
+      width: 34px; height: 34px; border-radius: 10px; background: var(--gold-bg);
+      border: 1px solid var(--gold-border); display: flex; align-items: center; justify-content: center; font-size: 15px;
+    }
+    .stat-val { font-size: 22px; font-weight: 900; }
+    .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+
+    /* Panels, Toolbars, Cards */
+    .panel-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+      padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow);
+    }
+    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+    .toolbar-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .toolbar-title { font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .search-input {
+      padding: 9px 12px; border-radius: 12px; border: 1px solid var(--border);
+      background: var(--surface-2); color: var(--text); font-size: 13px; outline: none; min-width: 210px;
+    }
+    .search-input:focus { border-color: #f59e0b; }
+
+    .chips-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 14px; }
+    .chip {
+      padding: 6px 12px; border-radius: 99px; border: 1px solid var(--border);
+      background: var(--surface-2); color: var(--text-muted); font-size: 12px; font-weight: 700; cursor: pointer;
+    }
+    .chip.active { background: var(--gold-grad); color: #0f172a; border-color: transparent; }
+
+    .cards-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 820px) { .cards-grid.two-col { grid-template-columns: repeat(2, 1fr); } }
+
+    .item-card {
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px;
+      padding: 14px; display: flex; flex-direction: column; gap: 10px;
+    }
+    .item-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .item-title { font-size: 15px; font-weight: 800; }
+    .item-sub { font-size: 12px; color: var(--text-muted); word-break: break-all; margin-top: 2px; }
+    .item-meta { display: flex; flex-wrap: wrap; gap: 6px; font-size: 11.5px; color: var(--text-muted); }
+    .meta-tag {
+      background: var(--surface); border: 1px solid var(--border);
+      padding: 3px 9px; border-radius: 8px; font-weight: 600;
+    }
+    .item-actions { display: flex; gap: 7px; flex-wrap: wrap; padding-top: 8px; border-top: 1px solid var(--border); }
+
+    /* Pills & Buttons */
+    .pill {
+      font-size: 10.5px; font-weight: 800; padding: 3px 9px; border-radius: 99px;
+      background: var(--gold-bg); border: 1px solid var(--gold-border); color: var(--primary);
+      display: inline-flex; align-items: center; gap: 4px;
+    }
+    .pill.green { background: rgba(16, 185, 129, 0.14); color: #10b981; border-color: rgba(16, 185, 129, 0.35); }
+    .pill.red { background: rgba(239, 68, 68, 0.14); color: #ef4444; border-color: rgba(239, 68, 68, 0.35); }
+    .pill.dark { background: #0f172a; color: #fde047; border-color: rgba(245, 158, 11, 0.55); }
+
+    .btn {
+      padding: 9px 14px; border-radius: 11px; border: none; font-size: 12.5px; font-weight: 700;
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btn-primary { background: var(--gold-grad); color: #0f172a; }
+    .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+    .btn-success { background: rgba(16, 185, 129, 0.16); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.35); }
+    .btn-danger { background: rgba(239, 68, 68, 0.14); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.32); }
+    .btn-sm { padding: 6px 10px; font-size: 11.5px; border-radius: 9px; }
+
+    /* Forms */
+    .form-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    @media (min-width: 600px) { .form-grid.two { grid-template-columns: 1fr 1fr; } }
+    .form-group { margin-bottom: 11px; }
+    .form-group label { display: block; font-size: 11.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 5px; }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%; padding: 10px 12px; border-radius: 11px; border: 1px solid var(--border);
+      background: var(--surface-2); color: var(--text); font-size: 13.5px; outline: none; font-family: inherit;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #f59e0b; }
+    .check-row {
+      display: flex; align-items: center; gap: 8px; padding: 9px 11px; border-radius: 11px;
+      background: var(--surface-2); border: 1px solid var(--border); font-size: 12.5px; font-weight: 700; cursor: pointer;
+    }
+    .check-row.disabled { opacity: 0.5; cursor: not-allowed; }
+    .check-row input[type="checkbox"] { width: 17px; height: 17px; accent-color: #f59e0b; }
+
+    /* Branding & Gallery Upload Controls */
+    .config-section-box {
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 14px;
+      padding: 12px; margin-bottom: 12px;
+    }
+    .config-section-title {
+      font-size: 12.5px; font-weight: 800; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 7px; color: var(--text);
+    }
+    .media-upload-row {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 8px;
+    }
+    .media-preview-box {
+      width: 56px; height: 56px; border-radius: 12px; background: var(--surface);
+      border: 1px solid var(--gold-border); display: flex; align-items: center; justify-content: center;
+      overflow: hidden; flex-shrink: 0; font-size: 20px; color: #d97706;
+    }
+    .media-preview-box img { width: 100%; height: 100%; object-fit: cover; }
+    .media-preview-box.qr-box { width: 68px; height: 68px; background: #ffffff; padding: 3px; }
+    .media-preview-box.qr-box img { object-fit: contain; }
+    .hidden-file-input { display: none !important; }
+
+    /* App / Tool Icon Box — solid gold color so WebView never clips it blank */
+    .app-mini-icon {
+      width: 44px; height: 44px; border-radius: 12px; background: var(--surface);
+      border: 1px solid var(--gold-border); display: flex; align-items: center; justify-content: center;
+      overflow: hidden; flex-shrink: 0; font-size: 19px; color: #d97706;
+    }
+    body.dark .app-mini-icon { color: #f59e0b; }
+    .app-mini-icon i { color: inherit; line-height: 1; }
+    .app-mini-icon img { width: 100%; height: 100%; object-fit: cover; padding: 4px; background: #fff; }
+
+    /* Icon Preview & Quick Picker */
+    .icon-input-wrap { display: flex; align-items: center; gap: 8px; }
+    .icon-picker-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 7px; align-items: center; }
+    .icon-pick-btn {
+      width: 32px; height: 32px; border-radius: 9px; border: 1px solid var(--border);
+      background: var(--surface-2); color: #d97706; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; font-size: 14px;
+    }
+    .icon-pick-btn:hover { border-color: #f59e0b; background: var(--gold-bg); }
+
+    /* Code box for 403 Rules */
+    .code-box {
+      background: #0f172a; color: #fde047; border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: 12px; padding: 12px; font-family: monospace; font-size: 11.5px;
+      line-height: 1.5; white-space: pre-wrap; word-break: break-word; margin: 8px 0 12px;
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.62); backdrop-filter: blur(4px);
+      z-index: 200; display: none; align-items: center; justify-content: center; padding: 16px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-card {
+      width: 100%; max-width: 560px; background: var(--surface); border-radius: 22px; padding: 20px;
+      max-height: 90vh; overflow-y: auto; border: 1px solid var(--border); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+    }
+    .modal-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
+    }
+    .empty-box {
+      text-align: center; padding: 28px 14px; color: var(--text-muted); font-size: 13px;
+      background: var(--surface-2); border: 1px dashed var(--border); border-radius: 16px;
+    }
+    .info-note {
+      font-size: 12px; color: var(--text-muted); background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: 11px; padding: 8px 12px; margin-bottom: 12px;
+    }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: #0f172a; color: #fde047; border: 1px solid rgba(245, 158, 11, 0.5);
+      padding: 10px 18px; border-radius: 99px; font-size: 13px; font-weight: 700;
+      z-index: 99999; opacity: 0; pointer-events: none; transition: all 0.25s;
+      display: inline-flex; align-items: center; gap: 8px; max-width: 92%;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+  <!-- Admin Passcode Lock -->
+  <div id="adminLockOverlay" class="admin-lock-overlay">
+    <div class="admin-lock-card">
+      <div class="brand-logo" style="width:56px;height:56px;margin:0 auto 14px;">
+        <i class="fa-solid fa-shield-halved gold-icon" style="font-size:26px;"></i>
+      </div>
+      <h2 style="font-size:19px;font-weight:800;margin-bottom:6px;">OSSIAN Unified Admin Panel</h2>
+      <p id="lockSubtitle" style="font-size:12.5px;color:#94a3b8;margin-bottom:16px;">
+        Enter your Admin Passcode to manage OSSIAN PRO &amp; OSSIAN TOK Buy.
+      </p>
+      <form id="adminAuthForm">
+        <div class="form-group" style="text-align:left;">
+          <label style="color:#cbd5e1;">Admin Passcode</label>
+          <input type="password" id="adminPassInput" placeholder="Enter passcode" required style="background:#1e293b;color:#fff;border-color:#334155;" />
+        </div>
+        <div class="form-group" id="lockConfirmWrap" style="display:none;text-align:left;">
+          <label style="color:#cbd5e1;">Confirm New Passcode</label>
+          <input type="password" id="adminPassConfirm" placeholder="Re-enter passcode" style="background:#1e293b;color:#fff;border-color:#334155;" />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:4px;">
+          <i class="fa-solid fa-unlock-keyhole"></i> <span id="lockBtnLabel">Unlock Admin Panel</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="admin-layout">
+    <header class="top-header">
+      <div class="brand">
+        <div class="brand-logo" id="headerBrandLogo"></div>
+        <div>
+          <div class="brand-title">OSSIAN Unified Admin Panel</div>
+          <span class="brand-sub">Controls OSSIAN PRO &amp; OSSIAN TOK Buy (ossian-web)</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <span class="sync-pill" id="cloudSyncPill">
+          <i class="fa-solid fa-spinner fa-spin gold-icon"></i> Connecting...
+        </span>
+        <button class="icon-btn" onclick="syncAllCollections(true)" title="Sync All Data">
+          <i class="fa-solid fa-arrows-rotate gold-icon"></i>
+        </button>
+        <button class="icon-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle Theme">
+          <i class="fa-solid fa-moon gold-icon"></i>
+        </button>
+        <button class="icon-btn" onclick="lockAdminNow()" title="Lock Admin Panel">
+          <i class="fa-solid fa-lock gold-icon"></i>
+        </button>
+      </div>
+    </header>
+
+    <div id="syncDiagnosticBanner" class="sync-banner">
+      <div style="flex:1;min-width:220px;">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span id="syncBannerText"></span>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn btn-sm btn-primary" id="fix403BannerBtn" style="display:none;" onclick="openFix403Modal()">
+          <i class="fa-solid fa-wrench"></i> Fix HTTP 403
+        </button>
+        <button class="btn btn-sm btn-secondary" onclick="document.getElementById('syncDiagnosticBanner').classList.remove('show')">Dismiss</button>
+      </div>
+    </div>
+
+    <nav class="nav-strip">
+      <button class="nav-tab active" data-tab="dashboard" onclick="switchAdminTab('dashboard')">
+        <i class="fa-solid fa-chart-pie"></i> Dashboard
+      </button>
+      <button class="nav-tab" data-tab="orders" onclick="switchAdminTab('orders')">
+        <i class="fa-solid fa-coins"></i> Token Orders <span class="badge-count" id="navBadgeOrders">0</span>
+      </button>
+      <button class="nav-tab" data-tab="apps" onclick="switchAdminTab('apps')">
+        <i class="fa-solid fa-grip"></i> Apps &amp; 4 Tools <span class="badge-count" id="navBadgeApps">0</span>
+      </button>
+      <button class="nav-tab" data-tab="submissions" onclick="switchAdminTab('submissions')">
+        <i class="fa-solid fa-list-check"></i> Submitted Apps <span class="badge-count" id="navBadgeSubs">0</span>
+      </button>
+      <button class="nav-tab" data-tab="users" onclick="switchAdminTab('users')">
+        <i class="fa-solid fa-users"></i> Users <span class="badge-count" id="navBadgeUsers">0</span>
+      </button>
+      <button class="nav-tab" data-tab="feedback" onclick="switchAdminTab('feedback')">
+        <i class="fa-solid fa-headset"></i> Feedback &amp; Requests <span class="badge-count" id="navBadgeFeedback">0</span>
+      </button>
+      <button class="nav-tab" data-tab="comms" onclick="switchAdminTab('comms')">
+        <i class="fa-solid fa-bullhorn"></i> Messages, Promos &amp; Appts
+      </button>
+      <button class="nav-tab" data-tab="branding" onclick="switchAdminTab('branding')">
+        <i class="fa-solid fa-sliders"></i> Branding &amp; Payments
+      </button>
+    </nav>
+
+    <main class="main-content">
+
+      <!-- 1. DASHBOARD -->
+      <section id="tab-dashboard" class="tab-pane active">
+        <div class="stats-grid">
+          <div class="stat-card" onclick="switchAdminTab('orders')">
+            <div class="stat-top"><span class="stat-icon"><i class="fa-solid fa-hourglass-half gold-icon"></i></span><span class="pill">TOK Buy</span></div>
+            <div class="stat-val" id="statPendingOrders">0</div>
+            <div class="stat-label">Pending Token Orders</div>
+          </div>
+          <div class="stat-card" onclick="switchAdminTab('orders')">
+            <div class="stat-top"><span class="stat-icon"><i class="fa-solid fa-sack-dollar gold-icon"></i></span><span class="pill green">Approved</span></div>
+            <div class="stat-val" id="statApprovedUsd">$0.00</div>
+            <div class="stat-label">Approved Order Volume</div>
+          </div>
+          <div class="stat-card" onclick="switchAdminTab('users')">
+            <div class="stat-top"><span class="stat-icon"><i class="fa-solid fa-users gold-icon"></i></span><span class="pill" id="statSuspPill">0 Susp</span></div>
+            <div class="stat-val" id="statTotalUsers">0</div>
+            <div class="stat-label">Total Registered Users</div>
+          </div>
+          <div class="stat-card" onclick="switchAdminTab('apps')">
+            <div class="stat-top"><span class="stat-icon"><i class="fa-solid fa-toolbox gold-icon"></i></span><span class="pill" id="statToolsPill">0 / 4 Tools</span></div>
+            <div class="stat-val" id="statTotalApps">0</div>
+            <div class="stat-label">Live Apps in Launcher</div>
+          </div>
+          <div class="stat-card" onclick="switchAdminTab('submissions')">
+            <div class="stat-top"><span class="stat-icon"><i class="fa-solid fa-paper-plane gold-icon"></i></span><span class="pill">6-Stage</span></div>
+            <div class="stat-val" id="statPendingSubs">0</div>
+            <div class="stat-label">Pending App Submissions</div>
+          </div>
+          <div class="stat-card" onclick="switchAdminTab('feedback')">
+            <div class="stat-top"><span class="stat-icon"><i class="fa-solid fa-user-check gold-icon"></i></span><span class="pill">Requests</span></div>
+            <div class="stat-val" id="statPendingReqs">0</div>
+            <div class="stat-label">Upload Requests / Tickets</div>
+          </div>
+          <div class="stat-card" onclick="switchAdminTab('comms')">
+            <div class="stat-top"><span class="stat-icon"><i class="fa-solid fa-ticket gold-icon"></i></span><span class="pill">Active</span></div>
+            <div class="stat-val" id="statActivePromos">0</div>
+            <div class="stat-label">Active Promo Codes</div>
+          </div>
+          <div class="stat-card" onclick="switchAdminTab('comms')">
+            <div class="stat-top"><span class="stat-icon"><i class="fa-solid fa-calendar-check gold-icon"></i></span><span class="pill">Schedule</span></div>
+            <div class="stat-val" id="statTotalAppts">0</div>
+            <div class="stat-label">User Appointments</div>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <div class="toolbar">
+            <div class="toolbar-title"><i class="fa-solid fa-bolt gold-icon"></i> Quick Actions</div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="openAppFormModal('app')"><i class="fa-solid fa-plus"></i> Add New App</button>
+            <button class="btn btn-secondary" onclick="openAppFormModal('tool')"><i class="fa-solid fa-wrench gold-icon"></i> Add Pro Tool (Slot 1–4)</button>
+            <button class="btn btn-secondary" onclick="switchAdminTab('orders')"><i class="fa-solid fa-coins gold-icon"></i> Review Token Orders</button>
+            <button class="btn btn-secondary" onclick="switchAdminTab('branding')"><i class="fa-solid fa-sliders gold-icon"></i> Logo &amp; Payment Settings</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. TOKEN ORDERS -->
+      <section id="tab-orders" class="tab-pane">
+        <div class="panel-card">
+          <div class="toolbar">
+            <div class="toolbar-title"><i class="fa-solid fa-coins gold-icon"></i> OSSIAN TOK Buy — Token Orders</div>
+            <div class="toolbar-left">
+              <input type="text" id="orderSearchInput" class="search-input" placeholder="Search UID, Email, TX ID, Method..." oninput="renderOrders()" />
+              <button class="btn btn-secondary btn-sm" onclick="fetchOrders(true)"><i class="fa-solid fa-arrows-rotate gold-icon"></i> Refresh</button>
+              <button class="btn btn-primary btn-sm" onclick="openFix403Modal()"><i class="fa-solid fa-key"></i> Firebase Auth / Rules</button>
+            </div>
+          </div>
+          <div class="chips-row">
+            <button class="chip active" onclick="setOrderFilter('all', this)">All</button>
+            <button class="chip" onclick="setOrderFilter('pending', this)">Pending Verification</button>
+            <button class="chip" onclick="setOrderFilter('approved', this)">Approved</button>
+            <button class="chip" onclick="setOrderFilter('rejected', this)">Rejected</button>
+          </div>
+          <div id="ordersList" class="cards-grid two-col"></div>
+        </div>
+      </section>
+
+      <!-- 3. APPS & 4 PRO TOOLS -->
+      <section id="tab-apps" class="tab-pane">
+        <div class="panel-card">
+          <div class="toolbar">
+            <div class="toolbar-title"><i class="fa-solid fa-toolbox gold-icon"></i> 4 Pro Tools (Pro Tools Only)</div>
+            <button class="btn btn-primary btn-sm" onclick="openAppFormModal('tool')"><i class="fa-solid fa-plus"></i> Add Pro Tool</button>
+          </div>
+          <div class="info-note">
+            <i class="fa-solid fa-circle-info gold-icon"></i> Pro Tools sirf <strong>Pro Tools</strong> section mein hi show hote hain (bina Category ke, aur Quick Launch / Live Web Apps mein show nahi honge).
+          </div>
+          <div id="toolsList" class="cards-grid two-col"></div>
+        </div>
+
+        <div class="panel-card">
+          <div class="toolbar">
+            <div class="toolbar-title"><i class="fa-solid fa-grip gold-icon"></i> Live Web Apps</div>
+            <div class="toolbar-left">
+              <input type="text" id="appSearchInput" class="search-input" placeholder="Search apps..." oninput="renderAppsAndTools()" />
+              <button class="btn btn-primary btn-sm" onclick="openAppFormModal('app')"><i class="fa-solid fa-plus"></i> Add App</button>
+            </div>
+          </div>
+          <div id="appsList" class="cards-grid two-col"></div>
+        </div>
+      </section>
+
+      <!-- 4. SUBMITTED APPS -->
+      <section id="tab-submissions" class="tab-pane">
+        <div class="panel-card">
+          <div class="toolbar">
+            <div class="toolbar-title"><i class="fa-solid fa-list-check gold-icon"></i> User Submitted Apps (6-Stage Launch)</div>
+            <button class="btn btn-secondary btn-sm" onclick="fetchSubmissions(true)"><i class="fa-solid fa-arrows-rotate gold-icon"></i> Refresh</button>
+          </div>
+          <div class="chips-row">
+            <button class="chip active" onclick="setSubFilter('all', this)">All</button>
+            <button class="chip" onclick="setSubFilter('pending', this)">Stage 1: Pending</button>
+            <button class="chip" onclick="setSubFilter('progress', this)">Stages 2–5: In Progress</button>
+            <button class="chip" onclick="setSubFilter('launched', this)">Stage 6: Launched</button>
+          </div>
+          <div id="submissionsList" class="cards-grid"></div>
+        </div>
+      </section>
+
+      <!-- 5. USERS -->
+      <section id="tab-users" class="tab-pane">
+        <div class="panel-card">
+          <div class="toolbar">
+            <div class="toolbar-title"><i class="fa-solid fa-users gold-icon"></i> Registered Users (OSSIAN PRO + TOK Buy)</div>
+            <div class="toolbar-left">
+              <input type="text" id="userSearchInput" class="search-input" placeholder="Search Name, Email, UID, IP, Code..." oninput="renderUsers()" />
+              <button class="btn btn-secondary btn-sm" onclick="fetchUsers(true)"><i class="fa-solid fa-arrows-rotate gold-icon"></i> Refresh</button>
+            </div>
+          </div>
+          <div class="chips-row">
+            <button class="chip active" onclick="setUserFilter('all', this)">All Users</button>
+            <button class="chip" onclick="setUserFilter('active', this)">Active</button>
+            <button class="chip" onclick="setUserFilter('suspended', this)">Suspended</button>
+            <button class="chip" onclick="setUserFilter('uploaders', this)">Upload Unlocked</button>
+          </div>
+          <div id="usersList" class="cards-grid two-col"></div>
+        </div>
+      </section>
+
+      <!-- 6. FEEDBACK & REQUESTS -->
+      <section id="tab-feedback" class="tab-pane">
+        <div class="panel-card">
+          <div class="toolbar">
+            <div class="toolbar-title"><i class="fa-solid fa-headset gold-icon"></i> Feedback, Upload Requests &amp; Customer Service</div>
+            <button class="btn btn-secondary btn-sm" onclick="fetchFeedbacks(true)"><i class="fa-solid fa-arrows-rotate gold-icon"></i> Refresh</button>
+          </div>
+          <div class="chips-row">
+            <button class="chip active" onclick="setFbFilter('all', this)">All</button>
+            <button class="chip" onclick="setFbFilter('upload', this)">Upload Requests</button>
+            <button class="chip" onclick="setFbFilter('support', this)">Customer Service</button>
+            <button class="chip" onclick="setFbFilter('general', this)">General Feedback</button>
+          </div>
+          <div id="feedbackList" class="cards-grid"></div>
+        </div>
+      </section>
+
+      <!-- 7. MESSAGES, PROMOS & APPOINTMENTS -->
+      <section id="tab-comms" class="tab-pane">
+        <div class="cards-grid two-col">
+          <div class="panel-card">
+            <div class="toolbar">
+              <div class="toolbar-title"><i class="fa-solid fa-envelope gold-icon"></i> Official Messages</div>
+            </div>
+            <form id="newMessageForm" style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);">
+              <div class="form-group">
+                <label>Title</label>
+                <input type="text" id="msgTitleInput" placeholder="e.g. Important Update" required />
+              </div>
+              <div class="form-group">
+                <label>Sender</label>
+                <input type="text" id="msgSenderInput" value="OSSIAN PRO Official" required />
+              </div>
+              <div class="form-group">
+                <label>Message Body</label>
+                <textarea id="msgBodyInput" rows="3" placeholder="Write official announcement..." required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Publish Official Message</button>
+            </form>
+            <div id="messagesList" class="cards-grid"></div>
+          </div>
+
+          <div class="panel-card">
+            <div class="toolbar">
+              <div class="toolbar-title"><i class="fa-solid fa-ticket gold-icon"></i> Promo Codes</div>
+            </div>
+            <form id="newPromoForm" style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);">
+              <div class="form-grid two">
+                <div class="form-group">
+                  <label>Promo Code</label>
+                  <input type="text" id="promoCodeInput" placeholder="e.g. OSSIAN2026" required />
+                </div>
+                <div class="form-group">
+                  <label>Reward / Description</label>
+                  <input type="text" id="promoRewardInput" placeholder="e.g. VIP Bonus Unlocked" required />
+                </div>
+              </div>
+              <label class="check-row" style="margin-bottom:10px;">
+                <input type="checkbox" id="promoActiveInput" checked /> Active Immediately
+              </label>
+              <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Create Promo Code</button>
+            </form>
+            <div id="promosList" class="cards-grid"></div>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <div class="toolbar">
+            <div class="toolbar-title"><i class="fa-solid fa-calendar-check gold-icon"></i> User Appointments</div>
+            <button class="btn btn-secondary btn-sm" onclick="fetchAppointments(true)"><i class="fa-solid fa-arrows-rotate gold-icon"></i> Refresh</button>
+          </div>
+          <div id="appointmentsList" class="cards-grid two-col"></div>
+        </div>
+      </section>
+
+      <!-- 8. BRANDING & PAYMENTS -->
+      <section id="tab-branding" class="tab-pane">
+        <div class="cards-grid two-col">
+          <div class="panel-card">
+            <div class="toolbar">
+              <div class="toolbar-title"><i class="fa-solid fa-palette gold-icon"></i> Shared Branding &amp; Payment Config</div>
+            </div>
+            <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px;line-height:1.5;">
+              Yahan se save karne par <strong>OSSIAN PRO</strong> (Header, Me, About, Favicon) aur <strong>OSSIAN TOK Buy</strong> (Logo, Binance Pay UID, Easypaisa QR, TRC-20 USDT) dono ek saath update ho jaate hain.
+            </p>
+            <form id="brandingConfigForm">
+
+              <!-- Website Icon / Logo -->
+              <div class="config-section-box">
+                <div class="config-section-title">
+                  <i class="fa-solid fa-crown gold-icon"></i> Website Icon / Logo
+                </div>
+                <div class="form-group" style="margin-bottom:6px;">
+                  <label>Image URL, Data URL, ya fa-icon (e.g. fa-crown) — khali chhorein to default SVG</label>
+                  <input type="text" id="cfgWebsiteIcon" placeholder="https://... or fa-crown or choose from gallery" oninput="updateBrandingPreviews()" />
+                </div>
+                <div class="media-upload-row">
+                  <div class="media-preview-box" id="cfgWebsiteIconPreview"></div>
+                  <input type="file" id="cfgWebsiteIconFile" class="hidden-file-input" accept="image/*" />
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('cfgWebsiteIconFile').click()">
+                    <i class="fa-solid fa-images gold-icon"></i> Choose Icon from Gallery
+                  </button>
+                  <button type="button" class="btn btn-danger btn-sm" onclick="clearBrandingField('cfgWebsiteIcon')">
+                    <i class="fa-solid fa-xmark"></i> Reset
+                  </button>
+                </div>
+              </div>
+
+              <!-- Binance Pay UID -->
+              <div class="config-section-box">
+                <div class="config-section-title">
+                  <i class="fa-solid fa-building-columns gold-icon"></i> Binance Pay
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label>Binance Pay UID (OSSIAN TOK Buy Method #2)</label>
+                  <input type="text" id="cfgBinanceUid" placeholder="Enter your Binance Pay UID" />
+                </div>
+              </div>
+
+              <!-- TRC-20 USDT Address & QR / Screenshot -->
+              <div class="config-section-box">
+                <div class="config-section-title">
+                  <i class="fa-solid fa-circle-dollar-to-slot gold-icon"></i> USDT (TRC-20) Deposit
+                </div>
+                <div class="form-group">
+                  <label>TRC-20 USDT Deposit Address</label>
+                  <input type="text" id="cfgTrc20Address" placeholder="Enter TRC-20 USDT address (starts with T...)" />
+                </div>
+                <div class="form-group" style="margin-bottom:6px;">
+                  <label>TRC-20 QR / Screenshot URL or Gallery Image</label>
+                  <input type="text" id="cfgTrc20Qr" placeholder="https://... or upload TRC-20 screenshot from gallery" oninput="updateBrandingPreviews()" />
+                </div>
+                <div class="media-upload-row">
+                  <div class="media-preview-box qr-box" id="cfgTrc20Preview">
+                    <i class="fa-solid fa-qrcode gold-icon"></i>
+                  </div>
+                  <input type="file" id="cfgTrc20File" class="hidden-file-input" accept="image/*" />
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('cfgTrc20File').click()">
+                    <i class="fa-solid fa-images gold-icon"></i> Choose TRC-20 Screenshot
+                  </button>
+                  <button type="button" class="btn btn-danger btn-sm" onclick="clearBrandingField('cfgTrc20Qr')">
+                    <i class="fa-solid fa-xmark"></i> Clear
+                  </button>
+                </div>
+              </div>
+
+              <!-- Easypaisa QR -->
+              <div class="config-section-box">
+                <div class="config-section-title">
+                  <i class="fa-solid fa-qrcode gold-icon"></i> Easypaisa QR (Method #5)
+                </div>
+                <div class="form-group" style="margin-bottom:6px;">
+                  <label>Easypaisa QR Image URL / Data URL</label>
+                  <input type="text" id="cfgEasypaisaQr" placeholder="https://... or upload image from gallery" oninput="updateBrandingPreviews()" />
+                </div>
+                <div class="media-upload-row">
+                  <div class="media-preview-box qr-box" id="cfgEasypaisaPreview">
+                    <i class="fa-solid fa-qrcode gold-icon"></i>
+                  </div>
+                  <input type="file" id="cfgEasypaisaFile" class="hidden-file-input" accept="image/*" />
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('cfgEasypaisaFile').click()">
+                    <i class="fa-solid fa-images gold-icon"></i> Choose QR from Gallery
+                  </button>
+                  <button type="button" class="btn btn-danger btn-sm" onclick="clearBrandingField('cfgEasypaisaQr')">
+                    <i class="fa-solid fa-xmark"></i> Clear
+                  </button>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary" id="saveBrandingBtn" style="width:100%;">
+                <i class="fa-solid fa-floppy-disk"></i> Save to Both Websites
+              </button>
+            </form>
+          </div>
+
+          <div class="panel-card">
+            <div class="toolbar">
+              <div class="toolbar-title"><i class="fa-solid fa-shield-halved gold-icon"></i> Admin Passcode &amp; Firebase Auth</div>
+            </div>
+            <form id="changeAdminPassForm">
+              <div class="form-group">
+                <label>New Admin Passcode</label>
+                <input type="password" id="newAdminPass" placeholder="Min 4 characters" required />
+              </div>
+              <div class="form-group">
+                <label>Confirm New Passcode</label>
+                <input type="password" id="confirmNewAdminPass" placeholder="Re-enter passcode" required />
+              </div>
+              <button type="submit" class="btn btn-primary"><i class="fa-solid fa-key"></i> Update Admin Passcode</button>
+            </form>
+            <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="openFix403Modal()">
+                <i class="fa-solid fa-database gold-icon"></i> Fix Token Orders HTTP 403 / Firebase Sign-In
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Add / Edit App or Tool Modal -->
+  <div class="modal-overlay" id="appFormModal" onclick="closeModalOnOverlay(event, 'appFormModal')">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 id="appModalTitle" style="font-size:17px;font-weight:800;">Add App</h3>
+        <button class="icon-btn" onclick="closeModal('appFormModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="appEditorForm">
+        <input type="hidden" id="editDocId" />
+        <input type="hidden" id="editOriginalCol" value="apps" />
+        <input type="hidden" id="editTargetCol" value="apps" />
+
+        <div class="form-grid two">
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" id="fAppName" placeholder="e.g. Wallet" required />
+          </div>
+          <div class="form-group" id="fAppCategoryGroup">
+            <label>Category</label>
+            <select id="fAppCategory">
+              <option value="Tools">Tools</option>
+              <option value="AI">AI</option>
+              <option value="Web Official App">Web Official App</option>
+              <option value="Social">Social</option>
+              <option value="Education">Education</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Gaming">Gaming</option>
+              <option value="Finance">Finance</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Website URL</label>
+          <input type="text" id="fAppUrl" placeholder="https://example.com" required />
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="fAppDesc" rows="2" placeholder="Short description..."></textarea>
+        </div>
+
+        <div class="form-grid two">
+          <div class="form-group">
+            <label>Icon (fa-wallet, URL, or Gallery)</label>
+            <div class="icon-input-wrap">
+              <div class="app-mini-icon" id="fAppIconPreview"><i class="fa-solid fa-wrench"></i></div>
+              <input type="text" id="fAppIcon" placeholder="fa-wallet or image URL" oninput="updateModalIconPreview()" />
+            </div>
+            <div class="icon-picker-row">
+              <input type="file" id="fAppIconFile" class="hidden-file-input" accept="image/*" />
+              <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('fAppIconFile').click()" title="Upload Icon from Gallery">
+                <i class="fa-solid fa-images gold-icon"></i> Gallery
+              </button>
+              <button type="button" class="icon-pick-btn" title="Wallet" onclick="pickModalIcon('fa-wallet')"><i class="fa-solid fa-wallet"></i></button>
+              <button type="button" class="icon-pick-btn" title="Withdraw" onclick="pickModalIcon('fa-money-bill-transfer')"><i class="fa-solid fa-money-bill-transfer"></i></button>
+              <button type="button" class="icon-pick-btn" title="Coins" onclick="pickModalIcon('fa-coins')"><i class="fa-solid fa-coins"></i></button>
+              <button type="button" class="icon-pick-btn" title="Bolt" onclick="pickModalIcon('fa-bolt')"><i class="fa-solid fa-bolt"></i></button>
+              <button type="button" class="icon-pick-btn" title="Robot" onclick="pickModalIcon('fa-robot')"><i class="fa-solid fa-robot"></i></button>
+              <button type="button" class="icon-pick-btn" title="Gem" onclick="pickModalIcon('fa-gem')"><i class="fa-solid fa-gem"></i></button>
+              <button type="button" class="icon-pick-btn" title="Support" onclick="pickModalIcon('fa-headset')"><i class="fa-solid fa-headset"></i></button>
+              <button type="button" class="icon-pick-btn" title="Chart" onclick="pickModalIcon('fa-chart-line')"><i class="fa-solid fa-chart-line"></i></button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Order / Slot (1–4 for Pro Tools)</label>
+            <input type="number" id="fAppOrder" value="1" min="0" />
+          </div>
+        </div>
+
+        <div class="form-grid two">
+          <div class="form-group">
+            <label>Token Cost (if Paid)</label>
+            <input type="number" id="fAppTokenCost" value="0" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Creator / Submitted By UID (Optional)</label>
+            <input type="text" id="fAppCreatorUid" placeholder="e.g. OW-123456" />
+          </div>
+        </div>
+
+        <div class="form-grid two" style="margin-bottom:14px;">
+          <label class="check-row" id="fAppOfficialRow"><input type="checkbox" id="fAppIsOfficial" /> Web Official App</label>
+          <label class="check-row" id="fAppShowHomeRow"><input type="checkbox" id="fAppShowHome" checked /> Show in Quick Launch</label>
+          <label class="check-row"><input type="checkbox" id="fAppIsPaid" /> Paid Website (Requires Tokens)</label>
+          <label class="check-row"><input type="checkbox" id="fAppIsTool" onchange="handleToolCheckboxToggle()" /> Pro Tool (Only Pro Tools)</label>
+        </div>
+
+        <div style="display:flex;gap:8px;">
+          <button type="submit" class="btn btn-primary" style="flex:1;"><i class="fa-solid fa-floppy-disk"></i> Save Item</button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal('appFormModal')">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div class="modal-overlay" id="userEditModal" onclick="closeModalOnOverlay(event, 'userEditModal')">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 style="font-size:17px;font-weight:800;"><i class="fa-solid fa-user-pen gold-icon"></i> Manage User</h3>
+        <button class="icon-btn" onclick="closeModal('userEditModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="userEditForm">
+        <input type="hidden" id="euDocId" />
+        <input type="hidden" id="euUid" />
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px;" id="euHeaderInfo">-</div>
+        <div class="form-grid two">
+          <div class="form-group">
+            <label>Balance ($ USD)</label>
+            <input type="number" step="0.01" id="euBalance" required />
+          </div>
+          <div class="form-group">
+            <label>Tokens</label>
+            <input type="number" id="euTokens" min="0" required />
+          </div>
+        </div>
+        <div class="form-grid two" style="margin-bottom:12px;">
+          <label class="check-row"><input type="checkbox" id="euCanSubmit" /> Unlock Submit Application</label>
+          <label class="check-row"><input type="checkbox" id="euSuspended" /> Suspend Account</label>
+        </div>
+        <div class="form-group">
+          <label>Suspension Reason (if suspended)</label>
+          <input type="text" id="euSuspendReason" placeholder="Reason shown to user..." />
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="clearUserBankingPin()"><i class="fa-solid fa-key gold-icon"></i> Clear Banking PIN</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="resetUserRegionLock()"><i class="fa-solid fa-earth-asia gold-icon"></i> Reset 60-Day Region Lock</button>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button type="submit" class="btn btn-primary" style="flex:1;"><i class="fa-solid fa-check"></i> Save User Changes</button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal('userEditModal')">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Fix HTTP 403 Modal -->
+  <div class="modal-overlay" id="fix403Modal" onclick="closeModalOnOverlay(event, 'fix403Modal')">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 style="font-size:17px;font-weight:800;"><i class="fa-solid fa-shield-halved gold-icon"></i> Fix Token Orders HTTP 403</h3>
+        <button class="icon-btn" onclick="closeModal('fix403Modal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p style="font-size:12.5px;color:var(--text-muted);line-height:1.5;margin-bottom:10px;">
+        <strong>HTTP 403</strong> ka matlab hai ke Firebase Firestore Security Rules <code>token_orders</code> collection ko read karne se rok rahe hain. Isay theek karne ke 2 tareeqe hain:
+      </p>
+
+      <div style="font-size:13px;font-weight:800;margin-bottom:4px;">Option 1: Firebase Console Rules Update Karein</div>
+      <p style="font-size:12px;color:var(--text-muted);">Firebase Console → Firestore Database → Rules mein yeh add karke <strong>Publish</strong> karein:</p>
+      <div class="code-box" id="firestoreRulesSnippet">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /token_orders/{docId} {
+      allow read, write: if true;
+    }
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}</div>
+      <button type="button" class="btn btn-secondary btn-sm" style="margin-bottom:14px;" onclick="copyRulesSnippet()">
+        <i class="fa-solid fa-copy gold-icon"></i> Copy Rules
+      </button>
+
+      <div style="padding-top:12px;border-top:1px solid var(--border);">
+        <div style="font-size:13px;font-weight:800;margin-bottom:4px;">Option 2: Firebase Auth Sign-In (Agar Rules mein <code>request.auth != null</code> laga hai)</div>
+        <div id="fbAuthStatusText" style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Not signed in with Firebase Auth.</div>
+        <form id="fbAuthLoginForm">
+          <div class="form-grid two">
+            <div class="form-group">
+              <label>Firebase Email</label>
+              <input type="email" id="fbLoginEmail" placeholder="admin@email.com" required />
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" id="fbLoginPass" placeholder="Password" required />
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-right-to-bracket"></i> Sign In &amp; Sync Orders</button>
+            <button type="button" class="btn btn-danger btn-sm" onclick="signOutFirebaseAuth()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i> <span>Updated!</span></div>
+
+  <script>
+    (function () {
+      const _j = function (a) { return a.join(""); };
+      const API_KEY = _j(["AIzaSyAmRa", "nnDqIGfpZb", "rM5UmQODj5", "Ww7AR6sHI"]);
+      const PROJECT_ID = _j(["ossian", "-web"]);
+      const BASE = "https://firestore.googleapis.com/v1/projects/" + PROJECT_ID + "/databases/(default)/documents";
+
+      const DEFAULT_SVG_LOGO =
+        '<svg viewBox="0 0 64 64" fill="none">' +
+        '<defs><linearGradient id="ossianGoldAdm" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">' +
+        '<stop offset="0%" stop-color="#fde047"/><stop offset="50%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#b45309"/>' +
+        '</linearGradient></defs>' +
+        '<circle cx="32" cy="32" r="20" stroke="url(#ossianGoldAdm)" stroke-width="5.5"/>' +
+        '<path d="M32 6L36 16H28L32 6Z" fill="url(#ossianGoldAdm)"/>' +
+        '<circle cx="32" cy="32" r="7" fill="url(#ossianGoldAdm)"/></svg>';
+      const DEFAULT_FAVICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23fde047'/%3E%3Cstop offset='55%25' stop-color='%23f59e0b'/%3E%3Cstop offset='100%25' stop-color='%23b45309'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='18' fill='%230f172a'/%3E%3Ccircle cx='32' cy='32' r='17' fill='none' stroke='url(%23g)' stroke-width='6'/%3E%3Cpath d='M32 10 L36 22 L32 19 L28 22 Z' fill='url(%23g)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='url(%23g)'/%3E%3C/svg%3E";
+
+      const COLS = {
+        apps: BASE + "/apps",
+        tools: BASE + "/tools",
+        orders: BASE + "/token_orders",
+        users: BASE + "/users",
+        submissions: BASE + "/submitted_apps",
+        feedback: BASE + "/feedback",
+        messages: BASE + "/messages",
+        promos: BASE + "/promocodes",
+        appointments: BASE + "/appointments",
+        branding: BASE + "/branding",
+        settings: BASE + "/settings",
+        config: BASE + "/config"
+      };
+
+      const ORDER_ALT_COLS = [
+        { name: "token_orders", url: BASE + "/token_orders" },
+        { name: "orders", url: BASE + "/orders" },
+        { name: "tokenOrders", url: BASE + "/tokenOrders" },
+        { name: "token_requests", url: BASE + "/token_requests" },
+        { name: "buy_requests", url: BASE + "/buy_requests" }
+      ];
+
+      let appsList = [];
+      let toolsList = [];
+      let ordersList = [];
+      let usersList = [];
+      let submissionsList = [];
+      let feedbackList = [];
+      let messagesList = [];
+      let promosList = [];
+      let appointmentsList = [];
+
+      let orderFilter = "all";
+      let subFilter = "all";
+      let userFilter = "all";
+      let fbFilter = "all";
+      let lastOrdersError = "";
+      const busyOrders = new Set();
+
+      document.getElementById("headerBrandLogo").innerHTML = DEFAULT_SVG_LOGO;
+
+      function safeGet(k, f) { try { var v = localStorage.getItem(k); return v !== null ? v : f; } catch (e) { return f; } }
+      function safeSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+      function safeDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+      function roundUsd(v) { return Math.round((Number(v) || 0) * 100) / 100; }
+      function fmtNum(n) { return (Number(n) || 0).toLocaleString(); }
+      function esc(s) {
+        return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+      }
+      function encArg(s) { return encodeURIComponent(String(s || "")); }
+      function decArg(s) { try { return decodeURIComponent(String(s || "")); } catch (e) { return String(s || ""); } }
+      function fmtDate(ts) {
+        if (!ts) return "-";
+        try {
+          var d = new Date(ts);
+          if (isNaN(d.getTime())) return String(ts);
+          return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }) +
+            " " + d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+        } catch (e) { return String(ts); }
+      }
+
+      function strVal(f, key, def) {
+        if (!f || !f[key]) return def || "";
+        var v = f[key];
+        if (typeof v.stringValue === "string") return v.stringValue;
+        if (v.integerValue !== undefined) return String(v.integerValue);
+        if (v.doubleValue !== undefined) return String(v.doubleValue);
+        if (typeof v.timestampValue === "string") return v.timestampValue;
+        return def || "";
+      }
+
+      function firstStr(f, keys, def) {
+        for (var i = 0; i < keys.length; i++) {
+          var val = strVal(f, keys[i], "");
+          if (val !== "") return val;
+        }
+        return def || "";
+      }
+
+      function numVal(f, key, def) {
+        if (!f || !f[key]) return def || 0;
+        var item = f[key];
+        var raw = item.integerValue !== undefined ? item.integerValue
+          : (item.doubleValue !== undefined ? item.doubleValue
+          : (typeof item.stringValue === "string" ? item.stringValue.trim() : undefined));
+        if (raw === "" || raw === undefined) return def || 0;
+        var v = Number(raw);
+        return isNaN(v) ? (def || 0) : v;
+      }
+
+      function firstNum(f, keys, def) {
+        for (var i = 0; i < keys.length; i++) {
+          if (f && f[keys[i]]) {
+            var n = numVal(f, keys[i], NaN);
+            if (!isNaN(n)) return n;
+          }
+        }
+        return def || 0;
+      }
+
+      function tsVal(f, key) {
+        if (!f || !f[key]) return 0;
+        var item = f[key];
+        if (item.integerValue !== undefined || item.doubleValue !== undefined) {
+          var n = Number(item.integerValue !== undefined ? item.integerValue : item.doubleValue);
+          if (!isNaN(n) && n > 0) return n < 1e12 ? n * 1000 : n;
+        }
+        var s = item.timestampValue || item.stringValue;
+        if (s) {
+          if (/^\d+$/.test(String(s).trim())) {
+            var num = Number(s);
+            return num < 1e12 ? num * 1000 : num;
+          }
+          var parsed = Date.parse(s);
+          if (!isNaN(parsed)) return parsed;
+        }
+        return 0;
+      }
+
+      function boolVal(f, key) {
+        return Boolean(f && f[key] && (f[key].booleanValue === true || f[key].stringValue === "true"));
+      }
+
+      function normalizeUrl(u) {
+        var s = String(u || "").trim();
+        if (!s) return "";
+        if (!/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(s)) return "https://" + s;
+        return s;
+      }
+
+      /* ================= IMAGE COMPRESSION FOR GALLERY UPLOAD ================= */
+      function compressImageFile(file, maxW, maxLen, onDone) {
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function (ev) {
+          var img = new Image();
+          img.onload = function () {
+            var w = img.width, h = img.height;
+            if (w > maxW) {
+              h = Math.max(1, Math.round(h * (maxW / w)));
+              w = maxW;
+            }
+            var c = document.createElement("canvas");
+            c.width = w;
+            c.height = h;
+            c.getContext("2d").drawImage(img, 0, 0, w, h);
+            var dataUrl = c.toDataURL("image/png");
+            if (dataUrl.length > maxLen) {
+              dataUrl = c.toDataURL("image/jpeg", 0.82);
+            }
+            if (dataUrl.length > maxLen) {
+              dataUrl = c.toDataURL("image/jpeg", 0.65);
+            }
+            onDone(dataUrl);
+          };
+          img.onerror = function () { showToast("Invalid image file!", true); };
+          img.src = ev.target.result;
+        };
+        reader.onerror = function () { showToast("Failed to read file!", true); };
+        reader.readAsDataURL(file);
+      }
+
+      /* ================= ICON NORMALIZER & RENDERER ================= */
+      function normalizeIconInput(raw) {
+        var s = String(raw || "").trim();
+        if (!s) return "";
+        if (/^(https?:\/\/|data:image\/)/i.test(s)) return s;
+
+        var classMatch = s.match(/class\s*=\s*["']([^"']+)["']/i);
+        if (classMatch && classMatch[1]) s = classMatch[1].trim();
+
+        var parts = s.split(/\s+/).filter(function (p) {
+          return p && p !== "gold-icon" && !/^fa-(xs|sm|lg|xl|2xl|\d+x|fw|spin|pulse)$/i.test(p);
+        });
+        if (!parts.length) return "";
+
+        var stylePrefixes = ["fa-solid", "fa-regular", "fa-light", "fa-thin", "fa-duotone", "fa-brands", "fas", "far", "fal", "fat", "fad", "fab"];
+        var styleCls = "";
+        var iconName = "";
+
+        parts.forEach(function (p) {
+          if (stylePrefixes.indexOf(p.toLowerCase()) !== -1) {
+            styleCls = p.toLowerCase();
+          } else {
+            iconName = p;
+          }
+        });
+
+        if (!iconName) return "";
+        if (!/^fa-/i.test(iconName)) iconName = "fa-" + iconName;
+        if (!styleCls || styleCls === "fa-solid" || styleCls === "fas") return iconName;
+        return styleCls + " " + iconName;
+      }
+
+      function buildIconHtml(rawIcon, fallbackIcon) {
+        var clean = normalizeIconInput(rawIcon);
+        var fb = fallbackIcon || "fa-globe";
+        if (!clean) {
+          return '<i class="fa-solid ' + esc(fb) + '"></i>';
+        }
+        if (/^(https?:\/\/|data:image\/)/i.test(clean)) {
+          return '<img src="' + esc(clean) + '" alt="" onerror="this.outerHTML=\'<i class=\\\'fa-solid ' + esc(fb) + '\\\'></i>\'" />';
+        }
+        var hasStyle = /^(fa-solid|fa-regular|fa-light|fa-thin|fa-duotone|fa-brands|fas|far|fal|fat|fad|fab)\s+/i.test(clean);
+        var cls = hasStyle ? clean : ("fa-solid " + clean);
+        return '<i class="' + esc(cls) + '"></i>';
+      }
+
+      function updateModalIconPreview() {
+        var raw = document.getElementById("fAppIcon").value;
+        var isTool = document.getElementById("fAppIsTool").checked;
+        document.getElementById("fAppIconPreview").innerHTML = buildIconHtml(raw, isTool ? "fa-wrench" : "fa-globe");
+      }
+
+      function pickModalIcon(cls) {
+        document.getElementById("fAppIcon").value = cls;
+        updateModalIconPreview();
+      }
+
+      document.getElementById("fAppIconFile").addEventListener("change", function (e) {
+        var file = e.target.files && e.target.files[0];
+        e.target.value = "";
+        if (!file) return;
+        compressImageFile(file, 192, 95000, function (dataUrl) {
+          document.getElementById("fAppIcon").value = dataUrl;
+          updateModalIconPreview();
+          showToast("App icon selected from gallery!");
+        });
+      });
+
+      async function sha256(text) {
+        var raw = "OSSIAN_ADMIN_SALT::" + String(text || "");
+        try {
+          if (window.crypto && window.crypto.subtle) {
+            var buf = await window.crypto.subtle.digest("SHA-256", new TextEncoder().encode(raw));
+            return Array.from(new Uint8Array(buf)).map(function (b) { return b.toString(16).padStart(2, "0"); }).join("");
+          }
+        } catch (e) {}
+        var h = 2166136261;
+        for (var i = 0; i < raw.length; i++) { h ^= raw.charCodeAt(i); h = Math.imul(h, 16777619); }
+        return String(h >>> 0);
+      }
+
+      var toastTimer;
+      function showToast(msg, isErr) {
+        var t = document.getElementById("toast");
+        var icon = t.querySelector("i");
+        icon.className = isErr ? "fa-solid fa-triangle-exclamation" : "fa-solid fa-circle-check";
+        icon.style.color = isErr ? "#ef4444" : "#fde047";
+        t.querySelector("span").textContent = msg;
+        t.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { t.classList.remove("show"); }, 3200);
+      }
+
+      function setSyncPill(state, text) {
+        var icon = state === "ok"
+          ? '<i class="fa-solid fa-circle-check" style="color:#10b981;"></i> '
+          : (state === "warn"
+            ? '<i class="fa-solid fa-circle-exclamation" style="color:#f59e0b;"></i> '
+            : '<i class="fa-solid fa-triangle-exclamation" style="color:#ef4444;"></i> ');
+        document.getElementById("cloudSyncPill").innerHTML = icon + esc(text);
+      }
+
+      /* ================= FIREBASE AUTH (OPTIONAL FOR 403) ================= */
+      function getFbAuth() {
+        try {
+          var raw = safeGet("ossian_fb_auth_v1", "");
+          return raw ? JSON.parse(raw) : null;
+        } catch (e) { return null; }
+      }
+
+      function updateFbAuthUi() {
+        var auth = getFbAuth();
+        var el = document.getElementById("fbAuthStatusText");
+        if (auth && auth.idToken) {
+          el.innerHTML = '<span style="color:#10b981;font-weight:700;">Signed in as ' + esc(auth.email || "Firebase User") + '</span>';
+        } else {
+          el.textContent = "Not signed in with Firebase Auth.";
+        }
+      }
+
+      async function refreshFbAuthToken() {
+        var auth = getFbAuth();
+        if (!auth || !auth.refreshToken) return null;
+        try {
+          var res = await fetch("https://securetoken.googleapis.com/v1/token?key=" + encodeURIComponent(API_KEY), {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "grant_type=refresh_token&refresh_token=" + encodeURIComponent(auth.refreshToken)
+          });
+          if (!res.ok) return null;
+          var data = await res.json();
+          auth.idToken = data.id_token;
+          auth.refreshToken = data.refresh_token || auth.refreshToken;
+          safeSet("ossian_fb_auth_v1", JSON.stringify(auth));
+          return auth.idToken;
+        } catch (e) { return null; }
+      }
+
+      async function authedFetch(url, options) {
+        var opts = Object.assign({ cache: "no-store" }, options || {});
+        var auth = getFbAuth();
+        if (auth && auth.idToken) {
+          opts.headers = Object.assign({}, opts.headers || {}, { "Authorization": "Bearer " + auth.idToken });
+        }
+        var res = await fetch(url, opts);
+        if (res.status === 401 && auth && auth.refreshToken) {
+          var newTok = await refreshFbAuthToken();
+          if (newTok) {
+            opts.headers = Object.assign({}, opts.headers || {}, { "Authorization": "Bearer " + newTok });
+            res = await fetch(url, opts);
+          }
+        }
+        return res;
+      }
+
+      document.getElementById("fbAuthLoginForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        var email = document.getElementById("fbLoginEmail").value.trim();
+        var pass = document.getElementById("fbLoginPass").value;
+        try {
+          var res = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + encodeURIComponent(API_KEY), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email, password: pass, returnSecureToken: true })
+          });
+          var data = await res.json();
+          if (!res.ok) throw new Error((data.error && data.error.message) || "Sign in failed");
+          safeSet("ossian_fb_auth_v1", JSON.stringify({ email: data.email, idToken: data.idToken, refreshToken: data.refreshToken }));
+          updateFbAuthUi();
+          closeModal("fix403Modal");
+          showToast("Firebase signed in! Syncing...");
+          syncAllCollections(true);
+        } catch (err) {
+          showToast("Auth error: " + err.message, true);
+        }
+      });
+
+      function signOutFirebaseAuth() {
+        safeDel("ossian_fb_auth_v1");
+        updateFbAuthUi();
+        showToast("Signed out of Firebase Auth");
+      }
+
+      function openFix403Modal() {
+        updateFbAuthUi();
+        document.getElementById("fix403Modal").classList.add("open");
+      }
+
+      function copyRulesSnippet() {
+        var txt = document.getElementById("firestoreRulesSnippet").textContent;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(txt).then(function () { showToast("Firestore Rules copied!"); });
+        } else {
+          showToast("Copy manually from the dark box above.");
+        }
+      }
+
+      /* ================= ADMIN PASSCODE GATE ================= */
+      function initAdminLock() {
+        var savedHash = safeGet("ossian_admin_pass_hash_v1", "");
+        var overlay = document.getElementById("adminLockOverlay");
+        var confirmWrap = document.getElementById("lockConfirmWrap");
+        var btnLabel = document.getElementById("lockBtnLabel");
+        var sub = document.getElementById("lockSubtitle");
+
+        if (!savedHash) {
+          confirmWrap.style.display = "block";
+          sub.textContent = "First-time setup: Create your private Admin Passcode to secure this panel.";
+          btnLabel.textContent = "Set Passcode & Open";
+        } else {
+          confirmWrap.style.display = "none";
+          sub.textContent = "Enter your Admin Passcode to manage OSSIAN PRO & OSSIAN TOK Buy.";
+          btnLabel.textContent = "Unlock Admin Panel";
+        }
+        overlay.classList.remove("hidden");
+        setTimeout(function () { document.getElementById("adminPassInput").focus(); }, 60);
+      }
+
+      function lockAdminNow() {
+        document.getElementById("adminPassInput").value = "";
+        document.getElementById("adminPassConfirm").value = "";
+        initAdminLock();
+      }
+
+      document.getElementById("adminAuthForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        var savedHash = safeGet("ossian_admin_pass_hash_v1", "");
+        var p1 = document.getElementById("adminPassInput").value;
+        var p2 = document.getElementById("adminPassConfirm").value;
+
+        if (!savedHash) {
+          if (p1.length < 4) { showToast("Passcode must be at least 4 characters!", true); return; }
+          if (p1 !== p2) { showToast("Passcodes do not match!", true); return; }
+          safeSet("ossian_admin_pass_hash_v1", await sha256(p1));
+          document.getElementById("adminLockOverlay").classList.add("hidden");
+          showToast("Admin Passcode set!");
+          syncAllCollections(false);
+        } else {
+          if (await sha256(p1) !== savedHash) { showToast("Wrong Admin Passcode!", true); return; }
+          document.getElementById("adminLockOverlay").classList.add("hidden");
+          showToast("Admin Panel Unlocked");
+          syncAllCollections(false);
+        }
+      });
+
+      document.getElementById("changeAdminPassForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        var p1 = document.getElementById("newAdminPass").value;
+        var p2 = document.getElementById("confirmNewAdminPass").value;
+        if (p1.length < 4) { showToast("Passcode must be at least 4 characters!", true); return; }
+        if (p1 !== p2) { showToast("Passcodes do not match!", true); return; }
+        safeSet("ossian_admin_pass_hash_v1", await sha256(p1));
+        document.getElementById("changeAdminPassForm").reset();
+        showToast("Admin Passcode updated!");
+      });
+
+      /* ================= FIRESTORE REST HELPERS ================= */
+      async function fsGetList(colUrl) {
+        var allDocs = [];
+        var pageToken = "";
+        for (var page = 0; page < 5; page++) {
+          var qs = "?pageSize=300&key=" + encodeURIComponent(API_KEY) +
+            (pageToken ? "&pageToken=" + encodeURIComponent(pageToken) : "");
+          var res = await authedFetch(colUrl + qs);
+          if (!res.ok) {
+            var errBody = await res.json().catch(function () { return {}; });
+            var msg = (errBody.error && errBody.error.message) ? errBody.error.message : ("HTTP " + res.status);
+            throw new Error("HTTP " + res.status + " (" + msg + ")");
+          }
+          var data = await res.json();
+          if (Array.isArray(data.documents)) allDocs = allDocs.concat(data.documents);
+          if (!data.nextPageToken) break;
+          pageToken = data.nextPageToken;
+        }
+        return allDocs;
+      }
+
+      async function fsGetDoc(colUrl, docId) {
+        var res = await authedFetch(colUrl + "/" + encodeURIComponent(docId) + "?key=" + encodeURIComponent(API_KEY));
+        return res.ok ? await res.json() : null;
+      }
+
+      async function fsPatch(colUrl, docId, fields, maskKeys) {
+        var qs = (maskKeys && maskKeys.length)
+          ? maskKeys.map(function (k) { return "updateMask.fieldPaths=" + encodeURIComponent(k); }).join("&") + "&"
+          : "";
+        var res = await authedFetch(colUrl + "/" + encodeURIComponent(docId) + "?" + qs + "key=" + encodeURIComponent(API_KEY), {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fields: fields })
+        });
+        if (!res.ok) {
+          var err = await res.json().catch(function () { return {}; });
+          throw new Error((err.error && err.error.message) || ("HTTP " + res.status));
+        }
+        return await res.json();
+      }
+
+      async function fsCreate(colUrl, docId, fields) {
+        var qs = docId ? ("documentId=" + encodeURIComponent(docId) + "&") : "";
+        var res = await authedFetch(colUrl + "?" + qs + "key=" + encodeURIComponent(API_KEY), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fields: fields })
+        });
+        if (!res.ok) {
+          var err = await res.json().catch(function () { return {}; });
+          throw new Error((err.error && err.error.message) || ("HTTP " + res.status));
+        }
+        return await res.json();
+      }
+
+      async function fsDelete(colUrl, docId) {
+        var res = await authedFetch(colUrl + "/" + encodeURIComponent(docId) + "?key=" + encodeURIComponent(API_KEY), { method: "DELETE" });
+        if (!res.ok) {
+          var err = await res.json().catch(function () { return {}; });
+          throw new Error((err.error && err.error.message) || ("Delete failed (HTTP " + res.status + ")"));
+        }
+      }
+
+      /* ================= TOKEN ORDERS ================= */
+      function normalizeOrderStatus(raw) {
+        var s = String(raw || "").trim().toLowerCase();
+        if (!s || s === "pending" || s === "pending verification" || s === "pending_verification" ||
+            s === "waiting" || s === "submitted" || s === "unverified" || s === "review" || s === "new") {
+          return "pending";
+        }
+        if (s === "approved" || s === "completed" || s === "success" || s === "verified" || s === "paid") {
+          return "approved";
+        }
+        if (s === "rejected" || s === "declined" || s === "cancelled" || s === "canceled" || s === "failed") {
+          return "rejected";
+        }
+        return "pending";
+      }
+
+      function parseOrderDoc(d, colName, colUrl) {
+        var f = d.fields || {};
+        var docId = (d.name || "").split("/").pop();
+        var baseTok = firstNum(f, ["baseTokens", "tokens", "tokenAmount", "qty"], 0);
+        var bonusTok = firstNum(f, ["bonusTokens", "bonus"], 0);
+        var totalTok = firstNum(f, ["totalTokens", "tokens", "tokenAmount"], baseTok + bonusTok);
+        if (!totalTok && (baseTok || bonusTok)) totalTok = baseTok + bonusTok;
+        var rawStatus = firstStr(f, ["status", "orderStatus", "state"], "pending");
+        return {
+          docId: docId,
+          colName: colName,
+          colUrl: colUrl,
+          orderId: firstStr(f, ["orderId", "id"], docId),
+          uid: firstStr(f, ["uid", "userUid", "userId"]),
+          name: firstStr(f, ["name", "userName", "fullName"], "User"),
+          email: firstStr(f, ["email", "userEmail"]),
+          boxId: firstNum(f, ["boxId", "packageId", "planId", "box"], 1),
+          baseTokens: baseTok,
+          bonusTokens: bonusTok,
+          totalTokens: totalTok,
+          usdAmount: firstNum(f, ["usdAmount", "amountUsd", "priceUsd", "usd", "amount"], 0),
+          localAmountText: firstStr(f, ["localAmountText", "localAmount", "amountText", "pkrAmount"]),
+          country: firstStr(f, ["country", "region"]),
+          paymentMethod: firstStr(f, ["paymentMethod", "method", "gateway"], "Payment"),
+          txId: firstStr(f, ["txId", "trxId", "transactionId", "tid", "reference", "txHash"]),
+          sender: firstStr(f, ["sender", "senderNumber", "senderAccount", "accountNumber", "from"]),
+          proofUrl: firstStr(f, ["proofUrl", "screenshotUrl", "receiptUrl", "screenshot", "image"]),
+          rawStatus: rawStatus,
+          status: normalizeOrderStatus(rawStatus),
+          tokensCredited: boolVal(f, "tokensCredited") || boolVal(f, "credited"),
+          createdAt: tsVal(f, "createdAt") || tsVal(f, "timestamp") || tsVal(f, "submittedAt")
+        };
+      }
+
+      async function fetchOrders(toastOnDone) {
+        lastOrdersError = "";
+        var results = await Promise.allSettled(
+          ORDER_ALT_COLS.map(function (c) {
+            return fsGetList(c.url).then(function (docs) { return { col: c, docs: docs }; });
+          })
+        );
+
+        var merged = [];
+        var seenPaths = new Set();
+        var primaryErr = null;
+        var anyOk = false;
+
+        results.forEach(function (res, idx) {
+          if (res.status === "fulfilled") {
+            anyOk = true;
+            var col = res.value.col;
+            res.value.docs.forEach(function (d) {
+              var fullName = d.name || (col.name + "/" + Math.random());
+              if (seenPaths.has(fullName)) return;
+              var f = d.fields || {};
+              if (col.name !== "token_orders") {
+                var looksLikeOrder = f.totalTokens || f.baseTokens || f.tokens || f.boxId || f.txId || f.trxId || f.transactionId || f.paymentMethod;
+                if (!looksLikeOrder) return;
+              }
+              seenPaths.add(fullName);
+              merged.push(parseOrderDoc(d, col.name, col.url));
+            });
+          } else if (idx === 0) {
+            primaryErr = res.reason;
+          }
+        });
+
+        if (!anyOk && primaryErr) {
+          lastOrdersError = primaryErr.message || "Permission denied";
+          ordersList = [];
+          renderOrders();
+          updateDashboardAndBadges();
+          if (toastOnDone) showToast("Token Orders error: " + lastOrdersError, true);
+          throw primaryErr;
+        }
+
+        ordersList = merged.sort(function (a, b) { return b.createdAt - a.createdAt; });
+        renderOrders();
+        updateDashboardAndBadges();
+        if (toastOnDone) showToast("Token orders synced (" + ordersList.length + ")!");
+      }
+
+      /* ================= APPS & 4 PRO TOOLS ================= */
+      function parseAppItem(d, isToolsCol) {
+        var f = d.fields || {};
+        var isToolFlag = isToolsCol || boolVal(f, "isTool") || boolVal(f, "isHomeTool") ||
+          strVal(f, "category").toLowerCase() === "pro tool";
+        return {
+          docId: (d.name || "").split("/").pop(),
+          col: isToolsCol ? "tools" : "apps",
+          name: firstStr(f, ["name", "title"]),
+          url: strVal(f, "url"),
+          description: strVal(f, "description"),
+          category: isToolFlag ? "" : strVal(f, "category", "Other"),
+          icon: strVal(f, "icon"),
+          isOfficial: isToolFlag ? false : (boolVal(f, "isOfficial") || boolVal(f, "isOwn")),
+          isTool: isToolFlag,
+          showOnHome: isToolFlag ? false : (f.showOnHome && typeof f.showOnHome.booleanValue === "boolean" ? f.showOnHome.booleanValue : true),
+          isPaid: boolVal(f, "isPaid") || boolVal(f, "paid") || strVal(f, "accessType").toLowerCase() === "paid",
+          tokenCost: firstNum(f, ["tokenCost", "tokensRequired"], 0),
+          submittedByUid: firstStr(f, ["submittedByUid", "uid"]),
+          externalUses: numVal(f, "externalUses", 0),
+          order: firstNum(f, ["order", "slot"], 0),
+          createdAt: tsVal(f, "createdAt")
+        };
+      }
+
+      async function fetchAppsAndTools() {
+        var res = await Promise.allSettled([fsGetList(COLS.apps), fsGetList(COLS.tools)]);
+        if (res[0].status === "rejected" && res[1].status === "rejected") {
+          throw res[0].reason || res[1].reason;
+        }
+        var appDocs = res[0].status === "fulfilled" ? res[0].value : [];
+        var toolDocs = res[1].status === "fulfilled" ? res[1].value : [];
+
+        var parsedApps = appDocs.map(function (d) { return parseAppItem(d, false); })
+          .filter(function (a) { return a.name || a.url; });
+        var parsedTools = toolDocs.map(function (d) { return parseAppItem(d, true); })
+          .filter(function (t) { return t.name || t.url; });
+
+        var strayToolsInApps = parsedApps.filter(function (a) { return a.isTool; });
+        appsList = parsedApps.filter(function (a) { return !a.isTool; })
+          .sort(function (a, b) { return b.createdAt - a.createdAt; });
+        toolsList = parsedTools.concat(strayToolsInApps)
+          .sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
+
+        renderAppsAndTools();
+        updateDashboardAndBadges();
+      }
+
+      async function fetchSubmissions(toastOnDone) {
+        var docs = await fsGetList(COLS.submissions);
+        submissionsList = docs.map(function (d) {
+          var f = d.fields || {};
+          return {
+            docId: (d.name || "").split("/").pop(),
+            name: firstStr(f, ["name", "appName"]),
+            url: strVal(f, "url"),
+            description: strVal(f, "description"),
+            category: strVal(f, "category", "Other"),
+            stage: numVal(f, "stage", 1),
+            status: strVal(f, "status", "pending"),
+            adminApproved: boolVal(f, "adminApproved") || boolVal(f, "approved"),
+            submittedByUid: firstStr(f, ["submittedByUid", "uid"]),
+            submittedByEmail: firstStr(f, ["submittedByEmail", "email"]),
+            createdAt: tsVal(f, "createdAt")
+          };
+        }).sort(function (a, b) { return b.createdAt - a.createdAt; });
+        renderSubmissions();
+        updateDashboardAndBadges();
+        if (toastOnDone) showToast("Submissions synced!");
+      }
+
+      async function fetchUsers(toastOnDone) {
+        var docs = await fsGetList(COLS.users);
+        usersList = docs.map(function (d) {
+          var f = d.fields || {};
+          var docId = (d.name || "").split("/").pop();
+          return {
+            docId: docId,
+            uid: strVal(f, "uid", docId),
+            name: strVal(f, "name"),
+            email: strVal(f, "email"),
+            balance: roundUsd(numVal(f, "balance", 0)),
+            tokens: Math.max(0, Math.floor(numVal(f, "tokens", 0))),
+            myInviteCode: strVal(f, "myInviteCode"),
+            ipAddress: strVal(f, "ipAddress"),
+            isMainAccount: boolVal(f, "isMainAccount"),
+            suspended: boolVal(f, "suspended"),
+            suspendReason: strVal(f, "suspendReason"),
+            canSubmitApp: boolVal(f, "canSubmitApp") || boolVal(f, "uploadApproved"),
+            buyCountry: strVal(f, "buyCountry"),
+            createdAt: tsVal(f, "createdAt")
+          };
+        }).sort(function (a, b) { return b.createdAt - a.createdAt; });
+        renderUsers();
+        updateDashboardAndBadges();
+        if (toastOnDone) showToast("Users synced!");
+      }
+
+      async function fetchFeedbacks(toastOnDone) {
+        var docs = await fsGetList(COLS.feedback);
+        feedbackList = docs.map(function (d) {
+          var f = d.fields || {};
+          return {
+            docId: (d.name || "").split("/").pop(),
+            option: strVal(f, "option"),
+            requestType: strVal(f, "requestType"),
+            status: strVal(f, "status", "received").toLowerCase(),
+            approved: boolVal(f, "approved") || boolVal(f, "uploadApproved") || boolVal(f, "adminApproved"),
+            message: strVal(f, "message"),
+            wordCount: numVal(f, "wordCount", 0),
+            userUid: firstStr(f, ["userUid", "uid"]),
+            userEmail: firstStr(f, ["userEmail", "email"]),
+            createdAt: tsVal(f, "createdAt")
+          };
+        }).sort(function (a, b) { return b.createdAt - a.createdAt; });
+        renderFeedbacks();
+        updateDashboardAndBadges();
+        if (toastOnDone) showToast("Feedback synced!");
+      }
+
+      async function fetchMessagesAndPromos() {
+        var res = await Promise.allSettled([fsGetList(COLS.messages), fsGetList(COLS.promos)]);
+        if (res[0].status === "rejected" && res[1].status === "rejected") {
+          throw res[0].reason || res[1].reason;
+        }
+        var mDocs = res[0].status === "fulfilled" ? res[0].value : [];
+        var pDocs = res[1].status === "fulfilled" ? res[1].value : [];
+
+        messagesList = mDocs.map(function (d) {
+          var f = d.fields || {};
+          return {
+            docId: (d.name || "").split("/").pop(),
+            title: strVal(f, "title", "Official Notice"),
+            body: firstStr(f, ["message", "body"]),
+            sender: strVal(f, "sender", "OSSIAN PRO Official"),
+            createdAt: tsVal(f, "createdAt")
+          };
+        }).sort(function (a, b) { return b.createdAt - a.createdAt; });
+
+        promosList = pDocs.map(function (d) {
+          var f = d.fields || {};
+          return {
+            docId: (d.name || "").split("/").pop(),
+            code: strVal(f, "code"),
+            reward: strVal(f, "reward"),
+            active: f.active && typeof f.active.booleanValue === "boolean" ? f.active.booleanValue : true
+          };
+        });
+        renderMessagesAndPromos();
+        updateDashboardAndBadges();
+      }
+
+      async function fetchAppointments(toastOnDone) {
+        var docs = await fsGetList(COLS.appointments);
+        appointmentsList = docs.map(function (d) {
+          var f = d.fields || {};
+          return {
+            docId: (d.name || "").split("/").pop(),
+            title: strVal(f, "title"),
+            date: strVal(f, "date"),
+            time: strVal(f, "time"),
+            note: strVal(f, "note"),
+            status: strVal(f, "status", "Scheduled"),
+            uid: strVal(f, "uid"),
+            email: strVal(f, "email"),
+            createdAt: tsVal(f, "createdAt")
+          };
+        }).sort(function (a, b) { return b.createdAt - a.createdAt; });
+        renderAppointments();
+        updateDashboardAndBadges();
+        if (toastOnDone) showToast("Appointments synced!");
+      }
+
+      async function fetchBrandingConfig() {
+        var foundIcon = "";
+        var foundBinance = "";
+        var foundTrc20Addr = "";
+        var foundTrc20Qr = "";
+        var foundEpQr = "";
+        var cols = [COLS.branding, COLS.settings, COLS.config];
+        var results = await Promise.allSettled(cols.map(function (c) { return fsGetList(c); }));
+        results.forEach(function (res) {
+          if (res.status !== "fulfilled") return;
+          res.value.forEach(function (d) {
+            var f = d.fields || {};
+            if (!foundIcon) foundIcon = firstStr(f, ["websiteIcon", "siteIcon", "logoUrl", "icon"]);
+            if (!foundBinance) foundBinance = firstStr(f, ["binanceUid", "binancePayUid"]);
+            if (!foundTrc20Addr) foundTrc20Addr = firstStr(f, ["trc20Address", "usdtTrc20Address", "usdtAddress", "trc20"]);
+            if (!foundTrc20Qr) foundTrc20Qr = firstStr(f, ["trc20QrUrl", "trc20Qr", "usdtQrUrl", "usdtQr", "trc20Screenshot"]);
+            if (!foundEpQr) foundEpQr = firstStr(f, ["easypaisaQrUrl", "easypaisaQr"]);
+          });
+        });
+        document.getElementById("cfgWebsiteIcon").value = foundIcon;
+        document.getElementById("cfgBinanceUid").value = foundBinance;
+        document.getElementById("cfgTrc20Address").value = foundTrc20Addr;
+        document.getElementById("cfgTrc20Qr").value = foundTrc20Qr;
+        document.getElementById("cfgEasypaisaQr").value = foundEpQr;
+        applyAdminHeaderLogo(foundIcon);
+        updateBrandingPreviews();
+      }
+
+      function applyAdminHeaderLogo(val) {
+        var box = document.getElementById("headerBrandLogo");
+        var fav = document.getElementById("adminFavicon");
+        if (!val) {
+          box.innerHTML = DEFAULT_SVG_LOGO;
+          fav.href = DEFAULT_FAVICON;
+          return;
+        }
+        if (/^(https?:\/\/|data:image\/)/i.test(val)) {
+          box.innerHTML = '<img src="' + esc(val) + '" alt="OSSIAN" />';
+          fav.href = val;
+        } else {
+          var clean = normalizeIconInput(val);
+          if (clean) {
+            var hasStyle = /^(fa-solid|fa-regular|fa-light|fa-thin|fa-duotone|fa-brands|fas|far|fal|fat|fad|fab)\s+/i.test(clean);
+            box.innerHTML = '<i class="' + esc(hasStyle ? clean : ("fa-solid " + clean)) + ' gold-icon" style="font-size:19px;"></i>';
+          } else {
+            box.innerHTML = DEFAULT_SVG_LOGO;
+          }
+          fav.href = DEFAULT_FAVICON;
+        }
+      }
+
+      function updateBrandingPreviews() {
+        var iconVal = document.getElementById("cfgWebsiteIcon").value.trim();
+        var iconPreview = document.getElementById("cfgWebsiteIconPreview");
+        if (!iconVal) {
+          iconPreview.innerHTML = DEFAULT_SVG_LOGO;
+        } else if (/^(https?:\/\/|data:image\/)/i.test(iconVal)) {
+          iconPreview.innerHTML = '<img src="' + esc(iconVal) + '" alt="Logo" onerror="this.parentNode.innerHTML=\'<i class=\\\'fa-solid fa-triangle-exclamation gold-icon\\\'></i>\'" />';
+        } else {
+          var clean = normalizeIconInput(iconVal);
+          if (clean) {
+            var hasStyle = /^(fa-solid|fa-regular|fa-light|fa-thin|fa-duotone|fa-brands|fas|far|fal|fat|fad|fab)\s+/i.test(clean);
+            iconPreview.innerHTML = '<i class="' + esc(hasStyle ? clean : ("fa-solid " + clean)) + ' gold-icon" style="font-size:22px;"></i>';
+          } else {
+            iconPreview.innerHTML = DEFAULT_SVG_LOGO;
+          }
+        }
+
+        var trcQrVal = document.getElementById("cfgTrc20Qr").value.trim();
+        var trcPreview = document.getElementById("cfgTrc20Preview");
+        if (trcQrVal && /^(https?:\/\/|data:image\/)/i.test(trcQrVal)) {
+          trcPreview.innerHTML = '<img src="' + esc(trcQrVal) + '" alt="TRC-20 QR" onerror="this.outerHTML=\'<i class=\\\'fa-solid fa-qrcode gold-icon\\\'></i>\'" />';
+        } else {
+          trcPreview.innerHTML = '<i class="fa-solid fa-qrcode gold-icon"></i>';
+        }
+
+        var epQrVal = document.getElementById("cfgEasypaisaQr").value.trim();
+        var epPreview = document.getElementById("cfgEasypaisaPreview");
+        if (epQrVal && /^(https?:\/\/|data:image\/)/i.test(epQrVal)) {
+          epPreview.innerHTML = '<img src="' + esc(epQrVal) + '" alt="Easypaisa QR" onerror="this.outerHTML=\'<i class=\\\'fa-solid fa-qrcode gold-icon\\\'></i>\'" />';
+        } else {
+          epPreview.innerHTML = '<i class="fa-solid fa-qrcode gold-icon"></i>';
+        }
+      }
+
+      function clearBrandingField(inputId) {
+        var el = document.getElementById(inputId);
+        if (el) el.value = "";
+        updateBrandingPreviews();
+        showToast("Cleared — click Save to apply changes!");
+      }
+
+      async function syncAllCollections(showMsg) {
+        setSyncPill("warn", "Syncing...");
+        var banner = document.getElementById("syncDiagnosticBanner");
+        var fixBtn = document.getElementById("fix403BannerBtn");
+        banner.classList.remove("show");
+        fixBtn.style.display = "none";
+
+        var tasks = [
+          { name: "Token Orders", fn: function () { return fetchOrders(false); } },
+          { name: "Apps & Tools", fn: function () { return fetchAppsAndTools(); } },
+          { name: "Submissions", fn: function () { return fetchSubmissions(false); } },
+          { name: "Users", fn: function () { return fetchUsers(false); } },
+          { name: "Feedback", fn: function () { return fetchFeedbacks(false); } },
+          { name: "Messages/Promos", fn: function () { return fetchMessagesAndPromos(); } },
+          { name: "Appointments", fn: function () { return fetchAppointments(false); } },
+          { name: "Branding", fn: function () { return fetchBrandingConfig(); } }
+        ];
+
+        var results = await Promise.allSettled(tasks.map(function (t) { return t.fn(); }));
+        var failed = [];
+        var has403 = false;
+        results.forEach(function (r, idx) {
+          if (r.status === "rejected") {
+            var msg = (r.reason && r.reason.message) ? r.reason.message : "Failed";
+            if (msg.indexOf("403") !== -1) has403 = true;
+            failed.push(tasks[idx].name + ": " + msg);
+          }
+        });
+
+        if (failed.length === 0) {
+          setSyncPill("ok", "Cloud Connected");
+          if (showMsg) showToast("All OSSIAN PRO & TOK Buy data synced!");
+        } else if (failed.length < tasks.length) {
+          setSyncPill("warn", "Partial Sync (" + (tasks.length - failed.length) + "/" + tasks.length + ")");
+          document.getElementById("syncBannerText").textContent = "Some collections failed to sync: " + failed.join(" | ");
+          if (has403) fixBtn.style.display = "inline-flex";
+          banner.classList.add("show");
+          if (showMsg) showToast("Synced with " + failed.length + " warning(s).", true);
+        } else {
+          setSyncPill("err", "Sync Error");
+          document.getElementById("syncBannerText").textContent = "Sync failed: " + failed[0];
+          if (has403) fixBtn.style.display = "inline-flex";
+          banner.classList.add("show");
+          if (showMsg) showToast("Sync error: " + failed[0], true);
+        }
+      }
+
+      /* ================= DASHBOARD & BADGES ================= */
+      function updateDashboardAndBadges() {
+        var pendingOrders = ordersList.filter(function (o) { return o.status === "pending"; }).length;
+        var approvedUsd = ordersList.filter(function (o) { return o.status === "approved"; })
+          .reduce(function (sum, o) { return sum + (o.usdAmount || 0); }, 0);
+        var suspUsers = usersList.filter(function (u) { return u.suspended; }).length;
+        var pendingSubs = submissionsList.filter(function (s) { return !s.adminApproved && s.stage < 2; }).length;
+        var pendingReqs = feedbackList.filter(function (fb) {
+          var opt = fb.option.toLowerCase();
+          var isReq = fb.requestType === "app_upload" || opt.includes("request") || opt.includes("upload") || fb.requestType === "customer_service";
+          return isReq && !fb.approved && fb.status !== "resolved" && fb.status !== "rejected";
+        }).length;
+        var activePromos = promosList.filter(function (p) { return p.active; }).length;
+
+        document.getElementById("statPendingOrders").textContent = pendingOrders;
+        document.getElementById("statApprovedUsd").textContent = "$" + roundUsd(approvedUsd).toFixed(2);
+        document.getElementById("statTotalUsers").textContent = usersList.length;
+        document.getElementById("statSuspPill").textContent = suspUsers + " Susp";
+        document.getElementById("statTotalApps").textContent = appsList.length;
+        document.getElementById("statToolsPill").textContent = toolsList.length + " / 4 Tools";
+        document.getElementById("statPendingSubs").textContent = pendingSubs;
+        document.getElementById("statPendingReqs").textContent = pendingReqs;
+        document.getElementById("statActivePromos").textContent = activePromos;
+        document.getElementById("statTotalAppts").textContent = appointmentsList.length;
+
+        var ob = document.getElementById("navBadgeOrders");
+        ob.textContent = pendingOrders > 0 ? pendingOrders + " Pending" : ordersList.length;
+        ob.classList.toggle("badge-alert", pendingOrders > 0);
+
+        document.getElementById("navBadgeApps").textContent = appsList.length + toolsList.length;
+        document.getElementById("navBadgeUsers").textContent = usersList.length;
+
+        var sb = document.getElementById("navBadgeSubs");
+        sb.textContent = pendingSubs > 0 ? pendingSubs + " New" : submissionsList.length;
+        sb.classList.toggle("badge-alert", pendingSubs > 0);
+
+        var fbb = document.getElementById("navBadgeFeedback");
+        fbb.textContent = pendingReqs > 0 ? pendingReqs + " Action" : feedbackList.length;
+        fbb.classList.toggle("badge-alert", pendingReqs > 0);
+      }
+
+      /* ================= TOKEN ORDERS RENDER & ACTIONS ================= */
+      function setOrderFilter(val, btn) {
+        orderFilter = val;
+        btn.parentNode.querySelectorAll(".chip").forEach(function (c) { c.classList.remove("active"); });
+        btn.classList.add("active");
+        renderOrders();
+      }
+
+      function renderOrders() {
+        var el = document.getElementById("ordersList");
+        if (lastOrdersError) {
+          el.innerHTML =
+            '<div class="empty-box" style="grid-column:1/-1;border-color:rgba(239,68,68,0.45);color:#ef4444;">' +
+              '<div style="font-weight:800;margin-bottom:6px;"><i class="fa-solid fa-lock"></i> Token Orders Blocked (' + esc(lastOrdersError) + ')</div>' +
+              '<div style="color:var(--text-muted);margin-bottom:12px;">Firebase Firestore Security Rules <code>token_orders</code> collection ko read karne se rok rahe hain.</div>' +
+              '<button class="btn btn-primary btn-sm" onclick="openFix403Modal()"><i class="fa-solid fa-wrench"></i> Fix HTTP 403 Now</button>' +
+            '</div>';
+          return;
+        }
+
+        var q = document.getElementById("orderSearchInput").value.trim().toLowerCase();
+        var filtered = ordersList.filter(function (o) {
+          var matchF = orderFilter === "all" || o.status === orderFilter;
+          var matchQ = !q || o.uid.toLowerCase().includes(q) || o.email.toLowerCase().includes(q) ||
+            o.txId.toLowerCase().includes(q) || o.name.toLowerCase().includes(q) ||
+            o.paymentMethod.toLowerCase().includes(q) || o.orderId.toLowerCase().includes(q);
+          return matchF && matchQ;
+        });
+
+        if (!filtered.length) {
+          el.innerHTML = '<div class="empty-box" style="grid-column:1/-1;">No token orders match this filter.</div>';
+          return;
+        }
+
+        el.innerHTML = filtered.map(function (o) {
+          var stClass = o.status === "approved" ? "green" : (o.status === "rejected" ? "red" : "");
+          var statusLabel = o.status === "pending" && o.rawStatus && o.rawStatus.toLowerCase() !== "pending"
+            ? o.rawStatus.toUpperCase()
+            : o.status.toUpperCase();
+          var key = encArg(o.colName + "::" + o.docId);
+          return '<div class="item-card">' +
+            '<div class="item-head">' +
+              '<div>' +
+                '<div class="item-title">Box #' + esc(o.boxId) + ' — +' + fmtNum(o.totalTokens) + ' Tokens</div>' +
+                '<div class="item-sub">' + esc(o.name) + ' • ' + esc(o.email || "No email") + ' (' + esc(o.uid || "No UID") + ')</div>' +
+              '</div>' +
+              '<span class="pill ' + stClass + '">' + esc(statusLabel) + (o.tokensCredited ? ' • Credited' : '') + '</span>' +
+            '</div>' +
+            '<div class="item-meta">' +
+              '<span class="meta-tag"><i class="fa-solid fa-coins gold-icon"></i> ' + fmtNum(o.baseTokens) + ' + ' + fmtNum(o.bonusTokens) + ' Bonus</span>' +
+              '<span class="meta-tag"><i class="fa-solid fa-money-bill gold-icon"></i> ' + esc(o.localAmountText || ("$" + o.usdAmount)) + ' ($' + o.usdAmount + ')</span>' +
+              '<span class="meta-tag"><i class="fa-solid fa-credit-card gold-icon"></i> ' + esc(o.paymentMethod) + '</span>' +
+              '<span class="meta-tag">TX: <strong>' + esc(o.txId || "-") + '</strong></span>' +
+              (o.sender ? '<span class="meta-tag">Sender: ' + esc(o.sender) + '</span>' : '') +
+              (o.colName !== "token_orders" ? '<span class="meta-tag">Source: ' + esc(o.colName) + '</span>' : '') +
+              '<span class="meta-tag">' + esc(fmtDate(o.createdAt)) + '</span>' +
+            '</div>' +
+            (o.proofUrl && /^(https?:\/\/|data:image\/)/i.test(o.proofUrl)
+              ? '<div><a href="' + esc(o.proofUrl) + '" target="_blank" rel="noopener" class="btn btn-secondary btn-sm"><i class="fa-solid fa-image gold-icon"></i> View Payment Proof</a></div>'
+              : '') +
+            '<div class="item-actions">' +
+              (o.status === "pending"
+                ? '<button class="btn btn-success btn-sm" onclick="approveTokenOrder(\'' + key + '\', this)"><i class="fa-solid fa-check"></i> Approve &amp; Credit +' + fmtNum(o.totalTokens) + '</button>' +
+                  '<button class="btn btn-danger btn-sm" onclick="rejectTokenOrder(\'' + key + '\', this)"><i class="fa-solid fa-ban"></i> Reject</button>'
+                : '') +
+              '<button class="btn btn-secondary btn-sm" onclick="deleteOrderItem(\'' + key + '\')"><i class="fa-solid fa-trash"></i> Delete</button>' +
+            '</div>' +
+          '</div>';
+        }).join("");
+      }
+
+      function findOrderByKey(encKey) {
+        var raw = decArg(encKey);
+        var parts = raw.split("::");
+        var colName = parts[0];
+        var docId = parts.slice(1).join("::");
+        return ordersList.find(function (o) { return o.colName === colName && o.docId === docId; });
+      }
+
+      function resolveUserDocId(uid, email) {
+        var uMatch = usersList.find(function (u) {
+          return (uid && (u.docId === uid || u.uid === uid)) ||
+                 (email && u.email && u.email.toLowerCase() === email.toLowerCase());
+        });
+        return uMatch ? uMatch.docId : uid;
+      }
+
+      async function approveTokenOrder(encKey, btnEl) {
+        if (busyOrders.has(encKey)) return;
+        var ord = findOrderByKey(encKey);
+        if (!ord) return;
+        busyOrders.add(encKey);
+        if (btnEl) btnEl.disabled = true;
+
+        try {
+          var freshOrdDoc = await fsGetDoc(ord.colUrl, ord.docId);
+          var alreadyCredited = freshOrdDoc && freshOrdDoc.fields &&
+            (boolVal(freshOrdDoc.fields, "tokensCredited") || boolVal(freshOrdDoc.fields, "credited"));
+
+          if (!alreadyCredited && ord.totalTokens > 0) {
+            var targetUserDocId = resolveUserDocId(ord.uid, ord.email);
+            if (!targetUserDocId) {
+              throw new Error("Order mein User UID/Email missing hai, tokens credit nahi ho sakte.");
+            }
+            var freshUserDoc = await fsGetDoc(COLS.users, targetUserDocId);
+            if (!freshUserDoc) {
+              throw new Error("User document (" + targetUserDocId + ") users collection mein nahi mila.");
+            }
+            var curTok = Math.max(0, Math.floor(numVal(freshUserDoc.fields || {}, "tokens", 0)));
+            await fsPatch(COLS.users, targetUserDocId, {
+              tokens: { integerValue: String(curTok + ord.totalTokens) }
+            }, ["tokens"]);
+          }
+
+          await fsPatch(ord.colUrl, ord.docId, {
+            status: { stringValue: "approved" },
+            tokensCredited: { booleanValue: true }
+          }, ["status", "tokensCredited"]);
+
+          showToast("Order approved & +" + fmtNum(ord.totalTokens) + " Tokens credited!");
+          await Promise.allSettled([fetchOrders(false), fetchUsers(false)]);
+        } catch (err) {
+          showToast("Error: " + err.message, true);
+        } finally {
+          busyOrders.delete(encKey);
+          if (btnEl) btnEl.disabled = false;
+        }
+      }
+
+      async function rejectTokenOrder(encKey, btnEl) {
+        if (busyOrders.has(encKey)) return;
+        var ord = findOrderByKey(encKey);
+        if (!ord) return;
+        busyOrders.add(encKey);
+        if (btnEl) btnEl.disabled = true;
+        try {
+          await fsPatch(ord.colUrl, ord.docId, { status: { stringValue: "rejected" } }, ["status"]);
+          showToast("Order rejected!");
+          await fetchOrders(false);
+        } catch (err) {
+          showToast("Error: " + err.message, true);
+        } finally {
+          busyOrders.delete(encKey);
+          if (btnEl) btnEl.disabled = false;
+        }
+      }
+
+      async function deleteOrderItem(encKey) {
+        var ord = findOrderByKey(encKey);
+        if (!ord) return;
+        if (!confirm("Are you sure you want to permanently delete this token order?")) return;
+        try {
+          await fsDelete(ord.colUrl, ord.docId);
+          showToast("Order deleted!");
+          await fetchOrders(false);
+        } catch (err) {
+          showToast("Delete error: " + err.message, true);
+        }
+      }
+
+      /* ================= APPS & 4 PRO TOOLS ================= */
+      function renderAppsAndTools() {
+        var tEl = document.getElementById("toolsList");
+        tEl.innerHTML = toolsList.length
+          ? toolsList.map(function (t) { return buildAppCardHtml(t, true); }).join("")
+          : '<div class="empty-box" style="grid-column:1/-1;">No Pro Tools added yet (Slots 1–4).</div>';
+
+        var q = document.getElementById("appSearchInput").value.trim().toLowerCase();
+        var filteredApps = appsList.filter(function (a) {
+          return !q || a.name.toLowerCase().includes(q) || a.category.toLowerCase().includes(q) || a.url.toLowerCase().includes(q);
+        });
+        var aEl = document.getElementById("appsList");
+        aEl.innerHTML = filteredApps.length
+          ? filteredApps.map(function (a) { return buildAppCardHtml(a, false); }).join("")
+          : '<div class="empty-box" style="grid-column:1/-1;">No live apps found.</div>';
+      }
+
+      function buildAppCardHtml(a, isToolCol) {
+        var iconHtml = buildIconHtml(a.icon, isToolCol ? "fa-wrench" : "fa-globe");
+        var idArg = encArg(a.docId);
+        return '<div class="item-card">' +
+          '<div class="item-head">' +
+            '<div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1;">' +
+              '<div class="app-mini-icon">' + iconHtml + '</div>' +
+              '<div style="min-width:0;">' +
+                '<div class="item-title">' + esc(a.name) + '</div>' +
+                '<div class="item-sub">' + esc(a.url) + '</div>' +
+              '</div>' +
+            '</div>' +
+            (a.isPaid
+              ? '<span class="pill dark"><i class="fa-solid fa-coins"></i> Paid (-' + a.tokenCost + ')</span>'
+              : (isToolCol
+                ? '<span class="pill">PRO TOOL</span>'
+                : '<span class="pill">' + esc(a.category || "Other") + '</span>')) +
+          '</div>' +
+          '<div class="item-meta">' +
+            (isToolCol
+              ? '<span class="meta-tag">Slot #' + (a.order || 1) + '</span><span class="meta-tag">Pro Tools Only</span>'
+              : (a.isOfficial ? '<span class="meta-tag">Web Official</span>' : '') +
+                (a.showOnHome ? '<span class="meta-tag">Quick Launch</span>' : '')) +
+            '<span class="meta-tag">External Uses: ' + a.externalUses + '</span>' +
+            (a.submittedByUid ? '<span class="meta-tag">Creator: ' + esc(a.submittedByUid) + '</span>' : '') +
+          '</div>' +
+          '<div class="item-actions">' +
+            '<button class="btn btn-secondary btn-sm" onclick="openEditAppModal(\'' + a.col + '\', \'' + idArg + '\')"><i class="fa-solid fa-pen gold-icon"></i> Edit</button>' +
+            '<button class="btn btn-danger btn-sm" onclick="deleteDocItem(\'' + a.col + '\', \'' + idArg + '\')"><i class="fa-solid fa-trash"></i> Delete</button>' +
+          '</div>' +
+        '</div>';
+      }
+
+      function handleToolCheckboxToggle() {
+        var isTool = document.getElementById("fAppIsTool").checked;
+        var catGroup = document.getElementById("fAppCategoryGroup");
+        var showHomeEl = document.getElementById("fAppShowHome");
+        var showHomeRow = document.getElementById("fAppShowHomeRow");
+        var offEl = document.getElementById("fAppIsOfficial");
+        var offRow = document.getElementById("fAppOfficialRow");
+
+        document.getElementById("editTargetCol").value = isTool ? "tools" : "apps";
+        if (isTool) {
+          catGroup.style.display = "none";
+          showHomeEl.checked = false;
+          showHomeEl.disabled = true;
+          showHomeRow.classList.add("disabled");
+          offEl.checked = false;
+          offEl.disabled = true;
+          offRow.classList.add("disabled");
+        } else {
+          catGroup.style.display = "block";
+          showHomeEl.disabled = false;
+          showHomeRow.classList.remove("disabled");
+          offEl.disabled = false;
+          offRow.classList.remove("disabled");
+        }
+        updateModalIconPreview();
+      }
+
+      function openAppFormModal(mode) {
+        document.getElementById("appEditorForm").reset();
+        document.getElementById("editDocId").value = "";
+        var isTool = mode === "tool";
+        document.getElementById("editOriginalCol").value = isTool ? "tools" : "apps";
+        document.getElementById("editTargetCol").value = isTool ? "tools" : "apps";
+        document.getElementById("appModalTitle").textContent = isTool ? "Add Pro Tool (Pro Tools Only)" : "Add Live Web App";
+        document.getElementById("fAppCategory").value = "AI";
+        document.getElementById("fAppIsTool").checked = isTool;
+        document.getElementById("fAppShowHome").checked = !isTool;
+        document.getElementById("fAppIsOfficial").checked = false;
+        document.getElementById("fAppOrder").value = isTool ? String(Math.min(4, toolsList.length + 1)) : "0";
+        handleToolCheckboxToggle();
+        document.getElementById("appFormModal").classList.add("open");
+      }
+
+      function openEditAppModal(col, encId) {
+        var docId = decArg(encId);
+        var item = (col === "tools" ? toolsList : appsList).find(function (x) { return x.docId === docId; });
+        if (!item) item = toolsList.concat(appsList).find(function (x) { return x.docId === docId; });
+        if (!item) return;
+
+        document.getElementById("editDocId").value = item.docId;
+        document.getElementById("editOriginalCol").value = item.col;
+        document.getElementById("editTargetCol").value = item.isTool ? "tools" : "apps";
+        document.getElementById("appModalTitle").textContent = "Edit " + item.name;
+        document.getElementById("fAppName").value = item.name;
+        document.getElementById("fAppCategory").value = item.category || "Other";
+        document.getElementById("fAppUrl").value = item.url;
+        document.getElementById("fAppDesc").value = item.description;
+        document.getElementById("fAppIcon").value = item.icon;
+        document.getElementById("fAppOrder").value = item.order || 0;
+        document.getElementById("fAppTokenCost").value = item.tokenCost || 0;
+        document.getElementById("fAppCreatorUid").value = item.submittedByUid || "";
+        document.getElementById("fAppIsOfficial").checked = item.isTool ? false : item.isOfficial;
+        document.getElementById("fAppShowHome").checked = item.isTool ? false : item.showOnHome;
+        document.getElementById("fAppIsPaid").checked = item.isPaid;
+        document.getElementById("fAppIsTool").checked = item.isTool;
+        handleToolCheckboxToggle();
+        document.getElementById("appFormModal").classList.add("open");
+      }
+
+      document.getElementById("appEditorForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        var docId = document.getElementById("editDocId").value;
+        var origCol = document.getElementById("editOriginalCol").value;
+        var isTool = document.getElementById("fAppIsTool").checked;
+        var targetCol = isTool ? "tools" : "apps";
+        var targetColUrl = targetCol === "tools" ? COLS.tools : COLS.apps;
+        var origColUrl = origCol === "tools" ? COLS.tools : COLS.apps;
+
+        var isPaid = document.getElementById("fAppIsPaid").checked;
+        var tokenCost = Math.max(0, parseInt(document.getElementById("fAppTokenCost").value, 10) || 0);
+        if (tokenCost > 0) isPaid = true;
+
+        var cleanUrl = normalizeUrl(document.getElementById("fAppUrl").value);
+        var cleanIcon = normalizeIconInput(document.getElementById("fAppIcon").value);
+        var showOnHome = isTool ? false : document.getElementById("fAppShowHome").checked;
+        var isOfficial = isTool ? false : document.getElementById("fAppIsOfficial").checked;
+        var categoryVal = isTool ? "" : document.getElementById("fAppCategory").value;
+
+        var fields = {
+          name: { stringValue: document.getElementById("fAppName").value.trim() },
+          url: { stringValue: cleanUrl },
+          description: { stringValue: document.getElementById("fAppDesc").value.trim() },
+          category: { stringValue: categoryVal },
+          icon: { stringValue: cleanIcon },
+          order: { integerValue: String(parseInt(document.getElementById("fAppOrder").value, 10) || 0) },
+          isOfficial: { booleanValue: isOfficial },
+          isOwn: { booleanValue: isOfficial },
+          showOnHome: { booleanValue: showOnHome },
+          isPaid: { booleanValue: isPaid },
+          tokenCost: { integerValue: String(tokenCost) },
+          isTool: { booleanValue: isTool },
+          isHomeTool: { booleanValue: isTool },
+          submittedByUid: { stringValue: document.getElementById("fAppCreatorUid").value.trim() }
+        };
+
+        try {
+          if (docId) {
+            if (origCol !== targetCol) {
+              fields.createdAt = { integerValue: String(Date.now()) };
+              await fsCreate(targetColUrl, "", fields);
+              await fsDelete(origColUrl, docId);
+            } else {
+              await fsPatch(targetColUrl, docId, fields, Object.keys(fields));
+            }
+            showToast(isTool ? "Pro Tool updated (no category, Pro Tools only)!" : "App updated!");
+          } else {
+            fields.createdAt = { integerValue: String(Date.now()) };
+            fields.externalUses = { integerValue: "0" };
+            await fsCreate(targetColUrl, "", fields);
+            showToast(isTool ? "Pro Tool added (no category, Pro Tools only)!" : "App added!");
+          }
+          closeModal("appFormModal");
+          await fetchAppsAndTools();
+        } catch (err) {
+          showToast("Error: " + err.message, true);
+        }
+      });
+
+      /* ================= SUBMITTED APPS (6 STAGES) ================= */
+      function setSubFilter(val, btn) {
+        subFilter = val;
+        btn.parentNode.querySelectorAll(".chip").forEach(function (c) { c.classList.remove("active"); });
+        btn.classList.add("active");
+        renderSubmissions();
+      }
+
+      function getStageLabel(n) {
+        return ({ 1: "1. Pending", 2: "2. Review", 3: "3. Checking", 4: "4. Final Stage", 5: "5. Launch Time (24h)", 6: "6. Successful Launch" })[n] || "1. Pending";
+      }
+
+      function renderSubmissions() {
+        var el = document.getElementById("submissionsList");
+        var list = submissionsList.filter(function (s) {
+          var st = s.adminApproved ? Math.max(2, s.stage) : 1;
+          if (subFilter === "pending") return st === 1;
+          if (subFilter === "progress") return st >= 2 && st <= 5;
+          if (subFilter === "launched") return st === 6;
+          return true;
+        });
+
+        if (!list.length) {
+          el.innerHTML = '<div class="empty-box">No submitted applications in this filter.</div>';
+          return;
+        }
+
+        el.innerHTML = list.map(function (s) {
+          var curStage = s.adminApproved ? Math.min(6, Math.max(2, s.stage)) : 1;
+          var idArg = encArg(s.docId);
+          var stageBtns = [1, 2, 3, 4, 5, 6].map(function (num) {
+            return '<button class="btn btn-sm ' + (curStage === num ? 'btn-primary' : 'btn-secondary') + '" onclick="updateSubmissionStage(\'' + idArg + '\', ' + num + ')">Stage ' + num + '</button>';
+          }).join("");
+
+          return '<div class="item-card">' +
+            '<div class="item-head">' +
+              '<div><div class="item-title">' + esc(s.name) + '</div><div class="item-sub">' + esc(s.url) + '</div></div>' +
+              '<span class="pill ' + (curStage === 6 ? 'green' : '') + '">' + getStageLabel(curStage) + '</span>' +
+            '</div>' +
+            '<div style="font-size:12.5px;color:var(--text-muted);">' + esc(s.description) + '</div>' +
+            '<div class="item-meta">' +
+              '<span class="meta-tag">Category: ' + esc(s.category) + '</span>' +
+              '<span class="meta-tag">By: ' + esc(s.submittedByEmail || s.submittedByUid) + '</span>' +
+              '<span class="meta-tag">' + esc(fmtDate(s.createdAt)) + '</span>' +
+            '</div>' +
+            '<div class="item-actions">' +
+              stageBtns +
+              '<button class="btn btn-success btn-sm" onclick="publishSubmissionToLiveApps(\'' + idArg + '\')"><i class="fa-solid fa-rocket"></i> Publish to Live Apps</button>' +
+              '<button class="btn btn-danger btn-sm" onclick="deleteDocItem(\'submissions\', \'' + idArg + '\')"><i class="fa-solid fa-trash"></i></button>' +
+            '</div>' +
+          '</div>';
+        }).join("");
+      }
+
+      async function updateSubmissionStage(encId, stageNum) {
+        var docId = decArg(encId);
+        var statusMap = { 1: "pending", 2: "review", 3: "checking", 4: "final", 5: "launching", 6: "launched" };
+        var fields = {
+          stage: { integerValue: String(stageNum) },
+          status: { stringValue: statusMap[stageNum] || "pending" },
+          adminApproved: { booleanValue: stageNum >= 2 }
+        };
+        var mask = ["stage", "status", "adminApproved"];
+        if (stageNum === 5) {
+          fields.launchStartAt = { integerValue: String(Date.now()) };
+          mask.push("launchStartAt");
+        }
+        try {
+          await fsPatch(COLS.submissions, docId, fields, mask);
+          showToast("Updated to " + getStageLabel(stageNum));
+          await fetchSubmissions(false);
+        } catch (err) {
+          showToast("Error: " + err.message, true);
+        }
+      }
+
+      async function publishSubmissionToLiveApps(encId) {
+        var docId = decArg(encId);
+        var sub = submissionsList.find(function (s) { return s.docId === docId; });
+        if (!sub) return;
+        try {
+          await fsCreate(COLS.apps, "", {
+            name: { stringValue: sub.name },
+            url: { stringValue: normalizeUrl(sub.url) },
+            description: { stringValue: sub.description },
+            category: { stringValue: sub.category || "Other" },
+            icon: { stringValue: "" },
+            isOfficial: { booleanValue: false },
+            isTool: { booleanValue: false },
+            showOnHome: { booleanValue: true },
+            isPaid: { booleanValue: false },
+            tokenCost: { integerValue: "0" },
+            submittedByUid: { stringValue: sub.submittedByUid || "" },
+            externalUses: { integerValue: "0" },
+            order: { integerValue: "0" },
+            createdAt: { integerValue: String(Date.now()) }
+          });
+          await updateSubmissionStage(encId, 6);
+          await fetchAppsAndTools();
+          showToast(sub.name + " published to Live Apps!");
+        } catch (err) {
+          showToast("Error: " + err.message, true);
+        }
+      }
+
+      /* ================= USERS ================= */
+      function setUserFilter(val, btn) {
+        userFilter = val;
+        btn.parentNode.querySelectorAll(".chip").forEach(function (c) { c.classList.remove("active"); });
+        btn.classList.add("active");
+        renderUsers();
+      }
+
+      function renderUsers() {
+        var el = document.getElementById("usersList");
+        var q = document.getElementById("userSearchInput").value.trim().toLowerCase();
+        var filtered = usersList.filter(function (u) {
+          var matchF = userFilter === "all" ||
+            (userFilter === "active" && !u.suspended) ||
+            (userFilter === "suspended" && u.suspended) ||
+            (userFilter === "uploaders" && u.canSubmitApp);
+          var matchQ = !q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q) ||
+            u.uid.toLowerCase().includes(q) || u.ipAddress.toLowerCase().includes(q) || u.myInviteCode.includes(q);
+          return matchF && matchQ;
+        });
+
+        if (!filtered.length) {
+          el.innerHTML = '<div class="empty-box" style="grid-column:1/-1;">No users match this filter.</div>';
+          return;
+        }
+
+        el.innerHTML = filtered.map(function (u) {
+          return '<div class="item-card">' +
+            '<div class="item-head">' +
+              '<div>' +
+                '<div class="item-title">' + esc(u.name || "Unnamed") + ' <span style="font-size:12px;color:var(--primary);">(' + esc(u.uid) + ')</span></div>' +
+                '<div class="item-sub">' + esc(u.email) + '</div>' +
+              '</div>' +
+              (u.suspended ? '<span class="pill red">SUSPENDED</span>' : '<span class="pill green">' + (u.isMainAccount ? 'MAIN ACTIVE' : 'ACTIVE') + '</span>') +
+            '</div>' +
+            '<div class="item-meta">' +
+              '<span class="meta-tag"><i class="fa-solid fa-wallet gold-icon"></i> $' + u.balance.toFixed(2) + '</span>' +
+              '<span class="meta-tag"><i class="fa-solid fa-coins gold-icon"></i> ' + fmtNum(u.tokens) + ' Tokens</span>' +
+              '<span class="meta-tag">Invite: ' + esc(u.myInviteCode || "-") + '</span>' +
+              '<span class="meta-tag">Upload: ' + (u.canSubmitApp ? 'Unlocked' : 'Locked') + '</span>' +
+              (u.ipAddress ? '<span class="meta-tag">IP: ' + esc(u.ipAddress) + '</span>' : '') +
+              (u.buyCountry ? '<span class="meta-tag">Country: ' + esc(u.buyCountry) + '</span>' : '') +
+            '</div>' +
+            '<div class="item-actions">' +
+              '<button class="btn btn-primary btn-sm" onclick="openEditUserModal(\'' + encArg(u.docId) + '\')"><i class="fa-solid fa-pen"></i> Edit Wallet / Security</button>' +
+            '</div>' +
+          '</div>';
+        }).join("");
+      }
+
+      function openEditUserModal(encDocId) {
+        var docId = decArg(encDocId);
+        var u = usersList.find(function (x) { return x.docId === docId || x.uid === docId; });
+        if (!u) return;
+        document.getElementById("euDocId").value = u.docId;
+        document.getElementById("euUid").value = u.uid;
+        document.getElementById("euHeaderInfo").textContent = (u.name || "User") + " • " + (u.email || "-") + " (" + u.uid + ")";
+        document.getElementById("euBalance").value = u.balance;
+        document.getElementById("euTokens").value = u.tokens;
+        document.getElementById("euCanSubmit").checked = u.canSubmitApp;
+        document.getElementById("euSuspended").checked = u.suspended;
+        document.getElementById("euSuspendReason").value = u.suspendReason || "";
+        document.getElementById("userEditModal").classList.add("open");
+      }
+
+      document.getElementById("userEditForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        var docId = document.getElementById("euDocId").value;
+        var bal = roundUsd(document.getElementById("euBalance").value);
+        var susp = document.getElementById("euSuspended").checked;
+        var tok = Math.max(0, parseInt(document.getElementById("euTokens").value, 10) || 0);
+        var canSub = document.getElementById("euCanSubmit").checked;
+        var reason = document.getElementById("euSuspendReason").value.trim();
+
+        try {
+          await fsPatch(COLS.users, docId, {
+            balance: { doubleValue: bal },
+            tokens: { integerValue: String(tok) },
+            canSubmitApp: { booleanValue: canSub },
+            suspended: { booleanValue: susp },
+            suspendReason: { stringValue: susp ? (reason || "Suspended by Admin") : "" }
+          }, ["balance", "tokens", "canSubmitApp", "suspended", "suspendReason"]);
+          closeModal("userEditModal");
+          showToast("User updated!");
+          await fetchUsers(false);
+        } catch (err) {
+          showToast("Error: " + err.message, true);
+        }
+      });
+
+      async function clearUserBankingPin() {
+        var docId = document.getElementById("euDocId").value;
+        try {
+          await fsPatch(COLS.users, docId, { bankingPinHash: { stringValue: "" } }, ["bankingPinHash"]);
+          showToast("User Banking PIN cleared!");
+        } catch (err) {
+          showToast("Error: " + err.message, true);
+        }
+      }
+
+      async function resetUserRegionLock() {
+        var docId = document.getElementById("euDocId").value;
+        try {
+          await fsPatch(COLS.users, docId, {
+            buyRegion: { stringValue: "" },
+            buyCountry: { stringValue: "" },
+            regionSavedAt: { integerValue: "0" }
+          }, ["buyRegion", "buyCountry", "regionSavedAt"]);
+          showToast("60-Day Region/Country lock reset!");
+          await fetchUsers(false);
+        } catch (err) {
+          showToast("Error: " + err.message, true);
+        }
+      }
+
+      /* ================= FEEDBACK & REQUESTS ================= */
+      function setFbFilter(val, btn) {
+        fbFilter = val;
+        btn.parentNode.querySelectorAll(".chip").forEach(function (c) { c.classList.remove("active"); });
+        btn.classList.add("active");
+        renderFeedbacks();
+      }
+
+      function renderFeedbacks() {
+        var el = document.getElementById("feedbackList");
+        var list = feedbackList.filter(function (fb) {
+          var opt = fb.option.toLowerCase();
+          var isUpload = fb.requestType === "app_upload" || opt.includes("request") || opt.includes("upload");
+          var isSupport = fb.requestType === "customer_service" || opt.includes("customer");
+          if (fbFilter === "upload") return isUpload;
+          if (fbFilter === "support") return isSupport;
+          if (fbFilter === "general") return !isUpload && !isSupport;
+          return true;
+        });
+
+        if (!list.length) {
+          el.innerHTML = '<div class="empty-box">No feedback or requests found.</div>';
+          return;
+        }
+
+        el.innerHTML = list.map(function (fb) {
+          var opt = fb.option.toLowerCase();
+          var isUpload = fb.requestType === "app_upload" || opt.includes("request") || opt.includes("upload");
+          var pillClass = fb.approved || fb.status === "resolved" ? "green" : (fb.status === "rejected" ? "red" : "");
+          var idArg = encArg(fb.docId);
+          var uidArg = encArg(fb.userUid);
+          var emailArg = encArg(fb.userEmail);
+          return '<div class="item-card">' +
+            '<div class="item-head">' +
+              '<div>' +
+                '<div class="item-title">' + esc(fb.option || fb.requestType || "Feedback") + '</div>' +
+                '<div class="item-sub">User: ' + esc(fb.userEmail || fb.userUid) + ' (UID: ' + esc(fb.userUid || "-") + ')</div>' +
+              '</div>' +
+              '<span class="pill ' + pillClass + '">' + esc(fb.approved ? "APPROVED" : fb.status.toUpperCase()) + '</span>' +
+            '</div>' +
+            '<div style="font-size:12.5px;line-height:1.5;white-space:pre-line;">' + esc(fb.message) + '</div>' +
+            '<div class="item-meta"><span class="meta-tag">' + esc(fmtDate(fb.createdAt)) + '</span><span class="meta-tag">' + fb.wordCount + ' words</span></div>' +
+            '<div class="item-actions">' +
+              (isUpload && !fb.approved
+                ? '<button class="btn btn-success btn-sm" onclick="approveUploadRequest(\'' + idArg + '\', \'' + uidArg + '\', \'' + emailArg + '\')"><i class="fa-solid fa-unlock"></i> Approve Upload Access</button>'
+                : '') +
+              (fb.status !== "resolved"
+                ? '<button class="btn btn-secondary btn-sm" onclick="markFeedbackStatus(\'' + idArg + '\', \'resolved\')"><i class="fa-solid fa-check gold-icon"></i> Mark Resolved</button>'
+                : '') +
+              '<button class="btn btn-danger btn-sm" onclick="deleteDocItem(\'feedback\', \'' + idArg + '\')"><i class="fa-solid fa-trash"></i></button>' +
+            '</div>' +
+          '</div>';
+        }).join("");
+      }
+
+      async function approveUploadRequest(encFbDocId, encUserUid, encUserEmail) {
+        var fbDocId = decArg(encFbDocId);
+        var userUid = decArg(encUserUid);
+        var userEmail = decArg(encUserEmail);
+        try {
+          await fsPatch(COLS.feedback, fbDocId, {
+            status: { stringValue: "approved" },
+            approved: { booleanValue: true },
+            uploadApproved: { booleanValue: true },
+            adminApproved: { booleanValue: true }
+          }, ["status", "approved", "uploadApproved", "adminApproved"]);
+
+          var targetUserDocId = resolveUserDocId(userUid, userEmail);
+          if (targetUserDocId && targetUserDocId !== "guest" && targetUserDocId !== "locked_user") {
+            await fsPatch(COLS.users, targetUserDocId, {
+              canSubmitApp: { booleanValue: true }
+            }, ["canSubmitApp"]);
+          }
+          showToast("Submit Application unlocked for user!");
+          await Promise.allSettled([fetchFeedbacks(false), fetchUsers(false)]);
+        } catch (err) {
+          showToast("Error: " + err.message, true);
+        }
+      }
+
+      async function markFeedbackStatus(encId, st) {
+        var docId = decArg(encId);
+        try {
+          await fsPatch(COLS.feedback, docId, { status: { stringValue: st } }, ["status"]);
+          showToast("Feedback marked " + st + "!");
+          await fetchFeedbacks(false);
+        } catch (err) {
+          showToast("Error: " + err.message, true);
+        }
+      }
+
+      /* ================= MESSAGES, PROMOS & APPOINTMENTS ================= */
+      function renderMessagesAndPromos() {
+        var mEl = document.getElementById("messagesList");
+        mEl.innerHTML = messagesList.length
+          ? messagesList.map(function (m) {
+              return '<div class="item-card">' +
+                '<div class="item-head">' +
+                  '<div><div class="item-title">' + esc(m.title) + '</div><div class="item-sub">' + esc(m.sender) + ' • ' + esc(fmtDate(m.createdAt)) + '</div></div>' +
+                  '<button class="btn btn-danger btn-sm" onclick="deleteDocItem(\'messages\', \'' + encArg(m.docId) + '\')"><i class="fa-solid fa-trash"></i></button>' +
+                '</div>' +
+                '<div style="font-size:12.5px;color:var(--text-muted);white-space:pre-line;">' + esc(m.body) + '</div>' +
+              '</div>';
+            }).join("")
+          : '<div class="empty-box">No official messages yet.</div>';
+
+        var pEl = document.getElementById("promosList");
+        pEl.innerHTML = promosList.length
+          ? promosList.map(function (p) {
+              var idArg = encArg(p.docId);
+              return '<div class="item-card">' +
+                '<div class="item-head">' +
+                  '<div><div class="item-title">' + esc(p.code) + '</div><div class="item-sub">' + esc(p.reward) + '</div></div>' +
+                  '<span class="pill ' + (p.active ? 'green' : 'red') + '">' + (p.active ? 'ACTIVE' : 'DISABLED') + '</span>' +
+                '</div>' +
+                '<div class="item-actions">' +
+                  '<button class="btn btn-secondary btn-sm" onclick="togglePromoActive(\'' + idArg + '\', ' + (!p.active) + ')">' + (p.active ? 'Disable' : 'Activate') + '</button>' +
+                  '<button class="btn btn-danger btn-sm" onclick="deleteDocItem(\'promos\', \'' + idArg + '\')"><i class="fa-solid fa-trash"></i></button>' +
+                '</div>' +
+              '</div>';
+            }).join("")
+          : '<div class="empty-box">No promo codes yet.</div>';
+      }
+
+      document.getElementById("newMessageForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        try {
+          await fsCreate(COLS.messages, "", {
+            title: { stringValue: document.getElementById("msgTitleInput").value.trim() },
+            sender: { stringValue: document.getElementById("msgSenderInput").value.trim() || "OSSIAN PRO Official" },
+            message: { stringValue: document.getElementById("msgBodyInput").value.trim() },
+            createdAt: { integerValue: String(Date.now()) }
+          });
+          document.getElementById("newMessageForm").reset();
+          document.getElementById("msgSenderInput").value = "OSSIAN PRO Official";
+          showToast("Official message published!");
+          await fetchMessagesAndPromos();
+        } catch (err) {
+          showToast("Error: " + err.message, true);
+        }
+      });
+
+      document.getElementById("newPromoForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        try {
+          await fsCreate(COLS.promos, "", {
+            code: { stringValue: document.getElementById("promoCodeInput").value.trim() },
+            reward: { stringValue: document.getElementById("promoRewardInput").value.trim() },
+            active: { booleanValue: document.getElementById("promoActiveInput").checked }
+          });
+          document.getElementById("newPromoForm").reset();
+          document.getElementById("promoActiveInput").checked = true;
+          showToast("Promo code created!");
+          await fetchMessagesAndPromos();
+        } catch (err) {
+          showToast("Error: " + err.message, true);
+        }
+      });
+
+      async function togglePromoActive(encId, newState) {
+        var docId = decArg(encId);
+        try {
+          await fsPatch(COLS.promos, docId, { active: { booleanValue: newState } }, ["active"]);
+          showToast(newState ? "Promo activated!" : "Promo disabled!");
+          await fetchMessagesAndPromos();
+        } catch (err) {
+          showToast("Error: " + err.message, true);
+        }
+      }
+
+      function renderAppointments() {
+        var el = document.getElementById("appointmentsList");
+        if (!appointmentsList.length) {
+          el.innerHTML = '<div class="empty-box" style="grid-column:1/-1;">No appointments booked yet.</div>';
+          return;
+        }
+        el.innerHTML = appointmentsList.map(function (a) {
+          var pillCls = a.status === "Confirmed" ? "green" : (a.status === "Cancelled" ? "red" : "");
+          var idArg = encArg(a.docId);
+          return '<div class="item-card">' +
+            '<div class="item-head">' +
+              '<div><div class="item-title">' + esc(a.title) + '</div><div class="item-sub">' + esc(a.email || a.uid || "Guest") + '</div></div>' +
+              '<span class="pill ' + pillCls + '">' + esc(a.status) + '</span>' +
+            '</div>' +
+            '<div class="item-meta">' +
+              '<span class="meta-tag"><i class="fa-solid fa-calendar gold-icon"></i> ' + esc(a.date) + '</span>' +
+              '<span class="meta-tag"><i class="fa-solid fa-clock gold-icon"></i> ' + esc(a.time) + '</span>' +
+            '</div>' +
+            (a.note ? '<div style="font-size:12px;color:var(--text-muted);">' + esc(a.note) + '</div>' : '') +
+            '<div class="item-actions">' +
+              '<button class="btn btn-success btn-sm" onclick="updateAppointmentStatus(\'' + idArg + '\', \'Confirmed\')">Confirm</button>' +
+              '<button class="btn btn-secondary btn-sm" onclick="updateAppointmentStatus(\'' + idArg + '\', \'Completed\')">Complete</button>' +
+              '<button class="btn btn-danger btn-sm" onclick="deleteDocItem(\'appointments\', \'' + idArg + '\')"><i class="fa-solid fa-trash"></i></button>' +
+            '</div>' +
+          '</div>';
+        }).join("");
+      }
+
+      async function updateAppointmentStatus(encId, statusVal) {
+        var docId = decArg(encId);
+        try {
+          await fsPatch(COLS.appointments, docId, { status: { stringValue: statusVal } }, ["status"]);
+          showToast("Appointment marked " + statusVal + "!");
+          await fetchAppointments(false);
+        } catch (err) {
+          showToast("Error: " + err.message, true);
+        }
+      }
+
+      /* ================= BRANDING & PAYMENT CONFIG (WITH GALLERY UPLOAD) ================= */
+      document.getElementById("cfgWebsiteIconFile").addEventListener("change", function (e) {
+        var file = e.target.files && e.target.files[0];
+        e.target.value = "";
+        if (!file) return;
+        compressImageFile(file, 256, 150000, function (dataUrl) {
+          document.getElementById("cfgWebsiteIcon").value = dataUrl;
+          updateBrandingPreviews();
+          showToast("Website icon selected from gallery — click Save!");
+        });
+      });
+
+      document.getElementById("cfgTrc20File").addEventListener("change", function (e) {
+        var file = e.target.files && e.target.files[0];
+        e.target.value = "";
+        if (!file) return;
+        compressImageFile(file, 520, 250000, function (dataUrl) {
+          document.getElementById("cfgTrc20Qr").value = dataUrl;
+          updateBrandingPreviews();
+          showToast("TRC-20 screenshot ready — click Save!");
+        });
+      });
+
+      document.getElementById("cfgEasypaisaFile").addEventListener("change", function (e) {
+        var file = e.target.files && e.target.files[0];
+        e.target.value = "";
+        if (!file) return;
+        compressImageFile(file, 520, 250000, function (dataUrl) {
+          document.getElementById("cfgEasypaisaQr").value = dataUrl;
+          updateBrandingPreviews();
+          showToast("Easypaisa QR image ready — click Save!");
+        });
+      });
+
+      document.getElementById("brandingConfigForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        var iconVal = document.getElementById("cfgWebsiteIcon").value.trim();
+        var binanceVal = document.getElementById("cfgBinanceUid").value.trim();
+        var trc20AddrVal = document.getElementById("cfgTrc20Address").value.trim();
+        var trc20QrVal = document.getElementById("cfgTrc20Qr").value.trim();
+        var epQrVal = document.getElementById("cfgEasypaisaQr").value.trim();
+        var btn = document.getElementById("saveBrandingBtn");
+        btn.disabled = true;
+
+        var fields = {
+          websiteIcon: { stringValue: iconVal },
+          siteIcon: { stringValue: iconVal },
+          binanceUid: { stringValue: binanceVal },
+          binancePayUid: { stringValue: binanceVal },
+          trc20Address: { stringValue: trc20AddrVal },
+          usdtTrc20Address: { stringValue: trc20AddrVal },
+          trc20QrUrl: { stringValue: trc20QrVal },
+          trc20Qr: { stringValue: trc20QrVal },
+          easypaisaQrUrl: { stringValue: epQrVal },
+          easypaisaQr: { stringValue: epQrVal },
+          updatedAt: { integerValue: String(Date.now()) }
+        };
+        var mask = Object.keys(fields);
+
+        try {
+          var writes = await Promise.allSettled([
+            fsPatch(COLS.branding, "branding", fields, mask),
+            fsPatch(COLS.settings, "site", fields, mask),
+            fsPatch(COLS.config, "site", fields, mask)
+          ]);
+          if (writes.every(function (w) { return w.status === "rejected"; })) {
+            throw writes[0].reason || new Error("Failed to save branding");
+          }
+          applyAdminHeaderLogo(iconVal);
+          updateBrandingPreviews();
+          showToast("Saved! Both OSSIAN PRO & TOK Buy updated.");
+        } catch (err) {
+          showToast("Error: " + err.message, true);
+        }
+        btn.disabled = false;
+      });
+
+      /* ================= GENERIC DELETE & NAVIGATION ================= */
+      async function deleteDocItem(colKey, encId) {
+        var docId = decArg(encId);
+        if (!confirm("Are you sure you want to permanently delete this item?")) return;
+        try {
+          await fsDelete(COLS[colKey], docId);
+          showToast("Deleted successfully!");
+          if (colKey === "orders") await fetchOrders(false);
+          else if (colKey === "apps" || colKey === "tools") await fetchAppsAndTools();
+          else if (colKey === "submissions") await fetchSubmissions(false);
+          else if (colKey === "feedback") await fetchFeedbacks(false);
+          else if (colKey === "messages" || colKey === "promos") await fetchMessagesAndPromos();
+          else if (colKey === "appointments") await fetchAppointments(false);
+        } catch (err) {
+          showToast("Delete error: " + err.message, true);
+        }
+      }
+
+      function switchAdminTab(name) {
+        document.querySelectorAll(".tab-pane").forEach(function (p) { p.classList.remove("active"); });
+        document.querySelectorAll(".nav-tab").forEach(function (b) {
+          b.classList.toggle("active", b.getAttribute("data-tab") === name);
+        });
+        document.getElementById("tab-" + name).classList.add("active");
+      }
+
+      function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+      function closeModalOnOverlay(e, id) { if (e.target.id === id) closeModal(id); }
+
+      function toggleTheme() {
+        var dark = !document.body.classList.contains("dark");
+        document.body.classList.toggle("dark", dark);
+        safeSet("ossian_admin_theme_v1", dark ? "dark" : "light");
+        document.getElementById("themeBtn").innerHTML = dark
+          ? '<i class="fa-solid fa-sun gold-icon"></i>'
+          : '<i class="fa-solid fa-moon gold-icon"></i>';
+      }
+
+      if (safeGet("ossian_admin_theme_v1", "light") === "dark") {
+        document.body.classList.add("dark");
+        document.getElementById("themeBtn").innerHTML = '<i class="fa-solid fa-sun gold-icon"></i>';
+      }
+
+      updateBrandingPreviews();
+
+      window.switchAdminTab = switchAdminTab;
+      window.syncAllCollections = syncAllCollections;
+      window.toggleTheme = toggleTheme;
+      window.lockAdminNow = lockAdminNow;
+      window.openFix403Modal = openFix403Modal;
+      window.copyRulesSnippet = copyRulesSnippet;
+      window.signOutFirebaseAuth = signOutFirebaseAuth;
+      window.setOrderFilter = setOrderFilter;
+      window.fetchOrders = fetchOrders;
+      window.renderOrders = renderOrders;
+      window.approveTokenOrder = approveTokenOrder;
+      window.rejectTokenOrder = rejectTokenOrder;
+      window.deleteOrderItem = deleteOrderItem;
+      window.renderAppsAndTools = renderAppsAndTools;
+      window.openAppFormModal = openAppFormModal;
+      window.openEditAppModal = openEditAppModal;
+      window.handleToolCheckboxToggle = handleToolCheckboxToggle;
+      window.updateModalIconPreview = updateModalIconPreview;
+      window.pickModalIcon = pickModalIcon;
+      window.setSubFilter = setSubFilter;
+      window.fetchSubmissions = fetchSubmissions;
+      window.updateSubmissionStage = updateSubmissionStage;
+      window.publishSubmissionToLiveApps = publishSubmissionToLiveApps;
+      window.setUserFilter = setUserFilter;
+      window.fetchUsers = fetchUsers;
+      window.renderUsers = renderUsers;
+      window.openEditUserModal = openEditUserModal;
+      window.clearUserBankingPin = clearUserBankingPin;
+      window.resetUserRegionLock = resetUserRegionLock;
+      window.setFbFilter = setFbFilter;
+      window.fetchFeedbacks = fetchFeedbacks;
+      window.approveUploadRequest = approveUploadRequest;
+      window.markFeedbackStatus = markFeedbackStatus;
+      window.togglePromoActive = togglePromoActive;
+      window.fetchAppointments = fetchAppointments;
+      window.updateAppointmentStatus = updateAppointmentStatus;
+      window.updateBrandingPreviews = updateBrandingPreviews;
+      window.clearBrandingField = clearBrandingField;
+      window.deleteDocItem = deleteDocItem;
+      window.closeModal = closeModal;
+      window.closeModalOnOverlay = closeModalOnOverlay;
+
+      initAdminLock();
+    })();
+  </script>
+</body>
+</html>
